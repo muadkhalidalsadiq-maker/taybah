@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
+import '../data/notification_service.dart';
 
 import 'adhkar_screen.dart';
 import 'asma_allah_screen.dart';
@@ -429,6 +430,7 @@ class _HomeTabState extends State<HomeTab> {
 
     if (mounted) {
       setState(() => _timings = times);
+      NotificationService.instance.scheduleDailyPrayers(times);
     }
   }
 

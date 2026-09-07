@@ -351,10 +351,15 @@ class PrayerApi {
       }
       if (permission == LocationPermission.deniedForever) return null;
 
+      try {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null) return lastKnown;
+      } catch (_) {}
+
       return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 5),
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
         ),
       );
     } catch (_) {

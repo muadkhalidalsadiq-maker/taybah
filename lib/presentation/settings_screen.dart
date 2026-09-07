@@ -220,7 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم إرسال إشعار أذان تجريبي الآن.',
+              'تم إرسال إشعار أذان تجريبي وتشغيل صوت الأذان الآن.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
@@ -233,9 +233,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              NotificationService.instance.stopAdhanAudio();
+            },
+            child: Text(
+              'إيقاف الأذان',
+              style: GoogleFonts.cairo(color: Colors.redAccent, fontWeight: FontWeight.bold),
+            ),
+          ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('تم التجربة'),
+            onPressed: () {
+              NotificationService.instance.stopAdhanAudio();
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TaybahColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('حسناً'),
           ),
         ],
       ),

@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
+import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
 
 class QiblaScreen extends StatefulWidget {
@@ -20,6 +24,14 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
   double _distanceKm = 2860.0;
   List<Map<String, dynamic>> _cities = [];
   bool _loading = true;
+  bool _isGpsActive = false;
+
+  // Compass Stream & Heading
+  StreamSubscription<CompassEvent>? _compassSubscription;
+  double? _deviceHeading;
+  bool _hasCompass = true;
+  bool _wasAligned = false;
+
   late AnimationController _animController;
   late Animation<double> _pulseAnim;
 
@@ -39,25 +51,75 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
       CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
     );
 
-    _loadData();
+    _initCompass();
+    _loadDataAndGps();
+  }
+
+  void _initCompass() {
+    _compassSubscription = FlutterCompass.events?.listen((CompassEvent event) {
+      if (!mounted) return;
+      final heading = event.heading;
+      if (heading != null) {
+        final relQibla = (_qiblaAngle - heading) % 360;
+        final diff = (relQibla > 180 ? 360 - relQibla : relQibla).abs();
+        final isAligned = diff < 4.0;
+
+        if (isAligned && !_wasAligned) {
+          HapticFeedback.mediumImpact();
+          _wasAligned = true;
+        } else if (!isAligned && _wasAligned) {
+          _wasAligned = false;
+        }
+
+        setState(() {
+          _deviceHeading = heading;
+          _hasCompass = true;
+        });
+      }
+    }, onError: (e) {
+      debugPrint('Compass error: $e');
+      if (mounted) setState(() => _hasCompass = false);
+    });
   }
 
   @override
   void dispose() {
+    _compassSubscription?.cancel();
     _animController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadDataAndGps() async {
     final cityName = await SharedPrefsHelper.instance.getSelectedCityName();
     final cities = await AssetLoader.loadCitiesLibya();
 
-    setState(() {
-      _cities = cities;
-      _selectedCityName = cityName;
-    });
+    if (mounted) {
+      setState(() {
+        _cities = cities;
+        _selectedCityName = cityName;
+      });
+    }
 
-    _updateCityCoords(cityName);
+    // Attempt GPS detection first
+    await _detectGpsLocation(fallbackCityName: cityName);
+  }
+
+  Future<void> _detectGpsLocation({String? fallbackCityName}) async {
+    final pos = await PrayerApi.getCurrentPosition();
+    if (pos != null && mounted) {
+      final bearing = _calculateQibla(pos.latitude, pos.longitude);
+      final distance = _calculateDistance(pos.latitude, pos.longitude, _meccaLat, _meccaLng);
+      setState(() {
+        _cityLat = pos.latitude;
+        _cityLng = pos.longitude;
+        _qiblaAngle = bearing;
+        _distanceKm = distance;
+        _isGpsActive = true;
+        _loading = false;
+      });
+    } else {
+      _updateCityCoords(fallbackCityName ?? _selectedCityName);
+    }
   }
 
   void _updateCityCoords(String cityName) {
@@ -79,17 +141,20 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
     final bearing = _calculateQibla(lat, lng);
     final distance = _calculateDistance(lat, lng, _meccaLat, _meccaLng);
 
-    setState(() {
-      _selectedCityName = cityName;
-      _cityLat = lat;
-      _cityLng = lng;
-      _qiblaAngle = bearing;
-      _distanceKm = distance;
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _selectedCityName = cityName;
+        _cityLat = lat;
+        _cityLng = lng;
+        _qiblaAngle = bearing;
+        _distanceKm = distance;
+        _isGpsActive = false;
+        _loading = false;
+      });
+    }
   }
 
-  // Bearing from city to Mecca in degrees (0 = North, 90 = East, 180 = South, 270 = West)
+  // Bearing from coordinates to Mecca in degrees (0 = North, 90 = East, 180 = South, 270 = West)
   double _calculateQibla(double lat, double lng) {
     final phi1 = lat * math.pi / 180.0;
     final phi2 = _meccaLat * math.pi / 180.0;
@@ -129,13 +194,35 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final heading = _deviceHeading ?? 0.0;
+
+    // Angle of needle relative to phone orientation
+    final double relativeQibla = ((_qiblaAngle - heading) % 360 + 360) % 360;
+    final double diffFromQibla = (relativeQibla > 180 ? 360 - relativeQibla : relativeQibla).abs();
+    final bool isAligned = diffFromQibla < 4.0;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('بوصلة القبلة الشريفة'),
         actions: [
           IconButton(
-            tooltip: 'تغيير المدينة',
+            tooltip: 'تحديث الموقع بالـ GPS',
+            icon: Icon(
+              _isGpsActive ? Icons.my_location_rounded : Icons.location_searching_rounded,
+              color: _isGpsActive ? TaybahColors.gold : null,
+            ),
+            onPressed: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('جاري جلب إحداثيات موقعك بالـ GPS...'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              await _detectGpsLocation();
+            },
+          ),
+          IconButton(
+            tooltip: 'تغيير المدينة يدوياً',
             icon: const Icon(Icons.location_city_rounded),
             onPressed: () => _showCityPicker(context),
           ),
@@ -147,7 +234,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 children: [
-                  // City & Info Card
+                  // City & GPS Info Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -178,12 +265,16 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.location_on_rounded, color: TaybahColors.goldLight, size: 20),
+                                    Icon(
+                                      _isGpsActive ? Icons.gps_fixed_rounded : Icons.location_on_rounded,
+                                      color: TaybahColors.goldLight,
+                                      size: 20,
+                                    ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      _selectedCityName,
+                                      _isGpsActive ? 'موقعك الدقيق (GPS)' : _selectedCityName,
                                       style: GoogleFonts.cairo(
-                                        fontSize: 22,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
@@ -200,17 +291,35 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                 ),
                               ],
                             ),
-                            OutlinedButton.icon(
-                              onPressed: () => _showCityPicker(context),
-                              icon: const Icon(Icons.swap_vert_rounded, size: 16, color: TaybahColors.goldLight),
-                              label: Text(
-                                'تغيير',
-                                style: GoogleFonts.cairo(fontSize: 13, color: Colors.white),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isAligned
+                                    ? Colors.green.withAlpha(180)
+                                    : Colors.white.withAlpha(25),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isAligned ? Colors.greenAccent : Colors.white24,
+                                ),
                               ),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: TaybahColors.goldLight),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isAligned ? Icons.check_circle_rounded : Icons.compass_calibration_rounded,
+                                    color: isAligned ? Colors.white : TaybahColors.goldLight,
+                                    size: 15,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    isAligned ? 'مواجه للقبلة' : '${heading.toStringAsFixed(0)}° بوصلة',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -222,17 +331,17 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildQuickStat(
-                              icon: Icons.explore_rounded,
-                              title: 'زاوية القبلة',
+                              label: 'زاوية القبلة',
                               value: '${_qiblaAngle.toStringAsFixed(1)}°',
                               subtitle: _getDirectionText(_qiblaAngle),
+                              icon: Icons.explore_rounded,
                             ),
-                            Container(width: 1, height: 40, color: Colors.white24),
+                            Container(width: 1, height: 36, color: Colors.white24),
                             _buildQuickStat(
-                              icon: Icons.route_rounded,
-                              title: 'المسافة إلى مكة',
+                              label: 'المسافة لمكة',
                               value: '${_distanceKm.toStringAsFixed(0)} كم',
-                              subtitle: 'المسجد الحرام',
+                              subtitle: 'مكة المكرمة',
+                              icon: Icons.straighten_rounded,
                             ),
                           ],
                         ),
@@ -240,9 +349,52 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
-                  // The Compass Visual Display
+                  // Alignment Status Banner
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isAligned
+                          ? Colors.green.withAlpha(35)
+                          : (isDark ? TaybahColors.darkSurface : TaybahColors.primaryTint),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isAligned ? Colors.green : TaybahColors.gold.withAlpha(80),
+                        width: isAligned ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isAligned ? Icons.check_circle_rounded : Icons.explore_rounded,
+                          color: isAligned ? Colors.green : TaybahColors.gold,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isAligned
+                              ? 'أنت باتجاه القبلة المشرفة تماماً ✓'
+                              : (_hasCompass
+                                  ? 'أدر الهاتف حتى يشير السهم الذهبي إلى الأعلى'
+                                  : 'وجّه الهاتف بزاوية ${_qiblaAngle.toStringAsFixed(0)}° بالنسبة للشمال'),
+                          style: GoogleFonts.cairo(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: isAligned
+                                ? Colors.green
+                                : (isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // The Dynamic Compass Visual Display
                   ScaleTransition(
                     scale: _pulseAnim,
                     child: SizedBox(
@@ -251,7 +403,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Outer Golden Decorative Ring
+                          // Outer Golden Decorative Ring with glowing alignment
                           Container(
                             width: 290,
                             height: 290,
@@ -265,98 +417,113 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: TaybahColors.gold.withAlpha(isDark ? 50 : 35),
-                                  blurRadius: 28,
-                                  spreadRadius: 4,
+                                  color: (isAligned ? Colors.green : TaybahColors.gold)
+                                      .withAlpha(isDark ? 80 : 50),
+                                  blurRadius: isAligned ? 36 : 24,
+                                  spreadRadius: isAligned ? 6 : 2,
                                 ),
                               ],
                             ),
                           ),
-                          // Dial Border with Gold Accents
-                          Container(
-                            width: 275,
-                            height: 275,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: TaybahColors.gold.withAlpha(150),
-                                width: 3,
-                              ),
-                            ),
-                          ),
-                          // Tick marks
-                          CustomPaint(
-                            size: const Size(270, 270),
-                            painter: _CompassTicksPainter(isDark: isDark),
-                          ),
-                          // Cardinal Labels
-                          Positioned(
-                            top: 14,
-                            child: Text(
-                              'ش (N)',
-                              style: GoogleFonts.cairo(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.redAccent,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 14,
-                            child: Text(
-                              'ج (S)',
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            right: 14,
-                            child: Text(
-                              'ش (E)',
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 14,
-                            child: Text(
-                              'غ (W)',
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          // Qibla Pointer Arm (Rotated by _qiblaAngle)
+
+                          // Compass Rose Dial (Rotates opposite to device heading so North stays True North)
                           Transform.rotate(
-                            angle: _qiblaAngle * (math.pi / 180.0),
+                            angle: -heading * (math.pi / 180.0),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Dial Border with Gold Accents
+                                Container(
+                                  width: 275,
+                                  height: 275,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isAligned ? Colors.green : TaybahColors.gold.withAlpha(150),
+                                      width: 3,
+                                    ),
+                                  ),
+                                ),
+                                // Tick marks
+                                CustomPaint(
+                                  size: const Size(270, 270),
+                                  painter: _CompassTicksPainter(isDark: isDark),
+                                ),
+                                // Cardinal Labels
+                                Positioned(
+                                  top: 14,
+                                  child: Text(
+                                    'ش (N)',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 14,
+                                  child: Text(
+                                    'ج (S)',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 14,
+                                  child: Text(
+                                    'ش (E)',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 14,
+                                  child: Text(
+                                    'غ (W)',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Dynamic Qibla Pointer Arm (Points towards Kaaba relative to device)
+                          Transform.rotate(
+                            angle: relativeQibla * (math.pi / 180.0),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 // Kaaba Emblem at Pointer Tip
-                                Container(
-                                  padding: const EdgeInsets.all(7),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: TaybahColors.gold,
+                                    color: isAligned ? Colors.green : TaybahColors.gold,
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: TaybahColors.gold.withAlpha(180),
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
+                                        color: (isAligned ? Colors.greenAccent : TaybahColors.gold)
+                                            .withAlpha(200),
+                                        blurRadius: 14,
+                                        spreadRadius: 3,
                                       ),
                                     ],
                                   ),
                                   child: const Icon(
                                     Icons.mosque_rounded,
-                                    color: Colors.black,
-                                    size: 20,
+                                    color: Colors.white,
+                                    size: 22,
                                   ),
                                 ),
                                 // Needle Body
@@ -364,8 +531,10 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   width: 4,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [TaybahColors.gold, Colors.redAccent],
+                                    gradient: LinearGradient(
+                                      colors: isAligned
+                                          ? [Colors.green, Colors.greenAccent]
+                                          : [TaybahColors.gold, Colors.redAccent],
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                     ),
@@ -376,14 +545,18 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                               ],
                             ),
                           ),
+
                           // Compass Center Pivot
                           Container(
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: TaybahColors.primaryDark,
-                              border: Border.all(color: TaybahColors.gold, width: 3),
+                              color: isAligned ? Colors.green.shade800 : TaybahColors.primaryDark,
+                              border: Border.all(
+                                color: isAligned ? Colors.greenAccent : TaybahColors.gold,
+                                width: 3,
+                              ),
                               boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
@@ -397,59 +570,29 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                     ),
                   ),
 
-                  const SizedBox(height: 28),
-
-                  // Angle Indicator Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isDark ? TaybahColors.darkSurface : TaybahColors.primaryTint,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isDark ? TaybahColors.darkBorder : TaybahColors.borderGlow,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.navigation_rounded, color: TaybahColors.primaryAccent, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'وجه جهازك بزاوية ${_qiblaAngle.toStringAsFixed(1)}° (${_getDirectionText(_qiblaAngle)}) باتجاه الكعبة المشرفة',
-                          style: GoogleFonts.cairo(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.primaryDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   const SizedBox(height: 24),
 
-                  // Hadith / Advice Card
+                  // Instructions Card
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? TaybahColors.darkSurfaceMuted : Colors.white,
+                      color: isDark ? TaybahColors.darkSurface : TaybahColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
                         color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
                       ),
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.info_outline_rounded, color: TaybahColors.gold, size: 20),
+                            const Icon(Icons.info_outline_rounded, color: TaybahColors.gold, size: 18),
                             const SizedBox(width: 8),
                             Text(
-                              'استقبال القبلة شرط لصحة الصلاة',
+                              'إرشادات لدقة اتجاه القبلة',
                               style: GoogleFonts.cairo(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
                               ),
@@ -458,11 +601,13 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'قال الله تعالى: ﴿فَوَلِّ وَجْهَكَ شَطْرَ الْمَسْجِدِ الْحَرَامِ وَحَيْثُ مَا كُنتُمْ فَوَلُّوا وُجُوهَكُمْ شَطْرَهُ﴾ [البقرة: 144].\nيتم احتساب اتجاه القبلة بدقة فلكية بناءً على الإحداثيات الجغرافية لمدينتك المختارة.',
+                          '• ضع الهاتف بشكل أفقي مستوٍ في راحة يدك أو على طاولة مستوية.\n'
+                          '• ابتعد عن الأجهزة الإلكترونية والمعادن لتجنب تشويش البوصلة.\n'
+                          '• إذا كانت البوصلة غير دقيقة، حرّك الهاتف في الهواء على شكل رقم (8) لمعايرتها.',
                           style: GoogleFonts.cairo(
-                            fontSize: 13,
+                            fontSize: 12,
+                            color: isDark ? Colors.white60 : TaybahColors.textSecondary,
                             height: 1.6,
-                            color: isDark ? TaybahColors.darkTextSecondary : TaybahColors.textSecondary,
                           ),
                         ),
                       ],
@@ -475,26 +620,29 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
   }
 
   Widget _buildQuickStat({
-    required IconData icon,
-    required String title,
+    required String label,
     required String value,
     required String subtitle,
+    required IconData icon,
   }) {
     return Column(
       children: [
-        Icon(icon, color: TaybahColors.goldLight, size: 22),
+        Icon(icon, color: TaybahColors.goldLight, size: 18),
         const SizedBox(height: 4),
         Text(
-          title,
-          style: GoogleFonts.cairo(fontSize: 11, color: Colors.white70),
-        ),
-        Text(
           value,
-          style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.cairo(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         Text(
           subtitle,
-          style: GoogleFonts.cairo(fontSize: 11, color: TaybahColors.goldLight),
+          style: GoogleFonts.cairo(
+            fontSize: 11,
+            color: Colors.white70,
+          ),
         ),
       ],
     );

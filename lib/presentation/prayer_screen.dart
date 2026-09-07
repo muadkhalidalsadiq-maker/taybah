@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
@@ -25,8 +27,10 @@ class _PrayerScreenState extends State<PrayerScreen>
   bool _isLoading = true;
   Timer? _countdownTimer;
 
-  // Qibla heading
+  // Qibla & Compass heading
   double _qiblaAngle = 104.0; // Typical Libya Qibla angle
+  StreamSubscription<CompassEvent>? _compassSub;
+  double? _deviceHeading;
 
   // Prayer notification toggles
   final Map<String, bool> _prayerAlerts = {
@@ -45,6 +49,10 @@ class _PrayerScreenState extends State<PrayerScreen>
     _loadSavedCityAndTimes();
     _loadNawafil();
     _loadPrayerAlerts();
+
+    _compassSub = FlutterCompass.events?.listen((event) {
+      if (mounted) setState(() => _deviceHeading = event.heading);
+    });
 
     // Refresh countdown every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -67,6 +75,9 @@ class _PrayerScreenState extends State<PrayerScreen>
     final next =
         await NotificationService.instance.togglePrayerNotification(key);
     setState(() => _prayerAlerts[key] = next);
+    if (_timings.isNotEmpty) {
+      NotificationService.instance.scheduleDailyPrayers(_timings);
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -105,7 +116,7 @@ class _PrayerScreenState extends State<PrayerScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم إرسال إشعار تجريبي لأذان $prayerName الآن.',
+              'تم إرسال إشعار تجريبي وتشغيل أذان $prayerName الآن.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
@@ -118,9 +129,26 @@ class _PrayerScreenState extends State<PrayerScreen>
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              NotificationService.instance.stopAdhanAudio();
+            },
+            child: Text(
+              'إيقاف الأذان',
+              style: GoogleFonts.cairo(color: Colors.redAccent, fontWeight: FontWeight.bold),
+            ),
+          ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('تم التجربة'),
+            onPressed: () {
+              NotificationService.instance.stopAdhanAudio();
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TaybahColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('حسناً'),
           ),
         ],
       ),
@@ -129,6 +157,7 @@ class _PrayerScreenState extends State<PrayerScreen>
 
   @override
   void dispose() {
+    _compassSub?.cancel();
     _countdownTimer?.cancel();
     _tabController.dispose();
     super.dispose();
@@ -160,6 +189,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         _timings = times;
         _isLoading = false;
       });
+      NotificationService.instance.scheduleDailyPrayers(times);
     }
   }
 
@@ -688,6 +718,11 @@ class _PrayerScreenState extends State<PrayerScreen>
   }
 
   Widget _buildQiblaTab() {
+    final heading = _deviceHeading ?? 0.0;
+    final relQibla = ((_qiblaAngle - heading) % 360 + 360) % 360;
+    final diff = (relQibla > 180 ? 360 - relQibla : relQibla).abs();
+    final isAligned = diff < 4.0;
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 110),
@@ -701,10 +736,13 @@ class _PrayerScreenState extends State<PrayerScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
-                border: Border.all(color: TaybahColors.border, width: 2),
+                border: Border.all(
+                  color: isAligned ? Colors.green : TaybahColors.border,
+                  width: isAligned ? 3 : 2,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(15),
+                    color: (isAligned ? Colors.green : Colors.black).withAlpha(isAligned ? 60 : 15),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -715,14 +753,14 @@ class _PrayerScreenState extends State<PrayerScreen>
                 children: [
                   // Compass Ring
                   Transform.rotate(
-                    angle: (_qiblaAngle * (3.1415926535 / 180.0)),
+                    angle: relQibla * (math.pi / 180.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: TaybahColors.primary,
+                          decoration: BoxDecoration(
+                            color: isAligned ? Colors.green : TaybahColors.primary,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -735,7 +773,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                         Container(
                           width: 4,
                           height: 40,
-                          color: TaybahColors.primary.withAlpha(100),
+                          color: (isAligned ? Colors.green : TaybahColors.primary).withAlpha(100),
                         ),
                       ],
                     ),
@@ -745,17 +783,17 @@ class _PrayerScreenState extends State<PrayerScreen>
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: TaybahColors.primaryTint,
+                      color: isAligned ? Colors.green.withAlpha(30) : TaybahColors.primaryTint,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: TaybahColors.primary,
+                        color: isAligned ? Colors.green : TaybahColors.primary,
                         width: 2,
                       ),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Icon(
                         Icons.mosque_rounded,
-                        color: TaybahColors.primary,
+                        color: isAligned ? Colors.green : TaybahColors.primary,
                         size: 30,
                       ),
                     ),

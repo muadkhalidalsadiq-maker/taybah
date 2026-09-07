@@ -192,7 +192,7 @@ class TaybahTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: TaybahColors.darkBg,
       cardColor: TaybahColors.darkSurface,
-      dialogBackgroundColor: TaybahColors.darkSurface,
+      dialogTheme: const DialogThemeData(backgroundColor: TaybahColors.darkSurface),
       canvasColor: TaybahColors.darkBg,
       dividerColor: TaybahColors.darkBorder,
       bottomSheetTheme: const BottomSheetThemeData(
