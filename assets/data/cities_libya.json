@@ -1,0 +1,506 @@
+[
+  {
+    "slug": "1478488_ly_zintan-(زنتان).html",
+    "ar_name": "زنتان",
+    "en_name": "zintan",
+    "full_name": "zintan (زنتان)",
+    "lat": 31.9317,
+    "lng": 12.2533
+  },
+  {
+    "slug": "1478321_ly_tripoli-(طرابلس).html",
+    "ar_name": "طرابلس",
+    "en_name": "tripoli",
+    "full_name": "tripoli (طرابلس)",
+    "lat": 32.8872,
+    "lng": 13.1913
+  },
+  {
+    "slug": "1477002_ly_benghazi-(بنغازي).html",
+    "ar_name": "بنغازي",
+    "en_name": "benghazi",
+    "full_name": "benghazi (بنغازي)",
+    "lat": 32.1167,
+    "lng": 20.0667
+  },
+  {
+    "slug": "1478492_ly_zliten-(زليطن).html",
+    "ar_name": "زليطن",
+    "en_name": "zliten",
+    "full_name": "zliten (زليطن)",
+    "lat": 32.4674,
+    "lng": 14.5687
+  },
+  {
+    "slug": "1478456_ly_zawia-(الزاوية).html",
+    "ar_name": "الزاوية",
+    "en_name": "zawia",
+    "full_name": "zawia (الزاوية)",
+    "lat": 32.7571,
+    "lng": 12.7278
+  },
+  {
+    "slug": "1477507_ly_Oil-refinery-(حقل-البيضاء).html",
+    "ar_name": "حقل البيضاء",
+    "en_name": "Oil refinery",
+    "full_name": "Oil refinery (حقل البيضاء)",
+    "lat": 29.8333,
+    "lng": 19.1667
+  },
+  {
+    "slug": "1478309_ly_tobruk-(طبرق).html",
+    "ar_name": "طبرق",
+    "en_name": "tobruk",
+    "full_name": "tobruk (طبرق)",
+    "lat": 32.0836,
+    "lng": 23.9764
+  },
+  {
+    "slug": "1478073_ly_sabha-(سبها_فجر1).html",
+    "ar_name": "سبها_فجر1",
+    "en_name": "sabha",
+    "full_name": "sabha (سبها_فجر1)",
+    "lat": 27.0377,
+    "lng": 14.4283
+  },
+  {
+    "slug": "2798003_ly_Sabha-(سبها_فجر2).html",
+    "ar_name": "سبها_فجر2",
+    "en_name": "Sabha",
+    "full_name": "Sabha (سبها_فجر2)",
+    "lat": 27.0377,
+    "lng": 14.4283
+  },
+  {
+    "slug": "1477386_ly_garian-(غريان).html",
+    "ar_name": "غريان",
+    "en_name": "garian",
+    "full_name": "garian (غريان)",
+    "lat": 32.1722,
+    "lng": 13.0203
+  },
+  {
+    "slug": "1477126_ly_derna-(درنة).html",
+    "ar_name": "درنة",
+    "en_name": "derna",
+    "full_name": "derna (درنة)",
+    "lat": 32.767,
+    "lng": 22.6367
+  },
+  {
+    "slug": "1476545_ly_ajdabiya-(اجدابيا).html",
+    "ar_name": "اجدابيا",
+    "en_name": "ajdabiya",
+    "full_name": "ajdabiya (اجدابيا)",
+    "lat": 30.7554,
+    "lng": 20.2263
+  },
+  {
+    "slug": "1477508_ly_iefren-(يفرين).html",
+    "ar_name": "يفرين",
+    "en_name": "iefren",
+    "full_name": "iefren (يفرين)",
+    "lat": 32.0631,
+    "lng": 12.5286
+  },
+  {
+    "slug": "1477698_ly_nalut-(نالوت).html",
+    "ar_name": "نالوت",
+    "en_name": "nalut",
+    "full_name": "nalut (نالوت)",
+    "lat": 31.8685,
+    "lng": 10.9812
+  },
+  {
+    "slug": "2798189_ly_-Al-Mahruqah-(محروقة).html",
+    "ar_name": "محروقة",
+    "en_name": "Al Mahruqah",
+    "full_name": "Al Mahruqah (محروقة)",
+    "lat": 27.5667,
+    "lng": 14.1667
+  },
+  {
+    "slug": "2797601_ly_-Umm-Al-Aranib-(ام-الارانب).html",
+    "ar_name": "ام الارانب",
+    "en_name": "Umm Al Aranib",
+    "full_name": "Umm Al Aranib (ام الارانب)",
+    "lat": 26.15,
+    "lng": 14.6167
+  },
+  {
+    "slug": "1476555_ly_al-ajaylat-(العجيلات).html",
+    "ar_name": "العجيلات",
+    "en_name": "al ajaylat",
+    "full_name": "al ajaylat (العجيلات)",
+    "lat": 32.7569,
+    "lng": 12.3761
+  },
+  {
+    "slug": "1476569_ly_al-aziziyah-(العزيزية).html",
+    "ar_name": "العزيزية",
+    "en_name": "al aziziyah",
+    "full_name": "al aziziyah (العزيزية)",
+    "lat": 32.5317,
+    "lng": 13.0178
+  },
+  {
+    "slug": "1476589_ly_al-burayqah-(البريقة).html",
+    "ar_name": "البريقة",
+    "en_name": "al burayqah",
+    "full_name": "al burayqah (البريقة)",
+    "lat": 30.4062,
+    "lng": 19.5739
+  },
+  {
+    "slug": "1476606_ly_al-fuwayhat-(الفوهيات).html",
+    "ar_name": "الفوهيات",
+    "en_name": "al fuwayhat",
+    "full_name": "al fuwayhat (الفوهيات)",
+    "lat": 32.0833,
+    "lng": 20.0833
+  },
+  {
+    "slug": "1476645_ly_al-jawsh-(الجوش).html",
+    "ar_name": "الجوش",
+    "en_name": "al jawsh",
+    "full_name": "al jawsh (الجوش)",
+    "lat": 31.9667,
+    "lng": 11.7
+  },
+  {
+    "slug": "1476663_ly_al-khums-(الخمس).html",
+    "ar_name": "الخمس",
+    "en_name": "al khums",
+    "full_name": "al khums (الخمس)",
+    "lat": 32.6486,
+    "lng": 14.2619
+  },
+  {
+    "slug": "1476664_ly_al-kufrah-(الكفره).html",
+    "ar_name": "الكفره",
+    "en_name": "al kufrah",
+    "full_name": "al kufrah (الكفره)",
+    "lat": 24.1833,
+    "lng": 23.3
+  },
+  {
+    "slug": "1476698_ly_al-marj-(المرج).html",
+    "ar_name": "المرج",
+    "en_name": "al marj",
+    "full_name": "al marj (المرج)",
+    "lat": 32.4922,
+    "lng": 20.8317
+  },
+  {
+    "slug": "1476714_ly_al-qaddahiyah-(القداحية).html",
+    "ar_name": "القداحية",
+    "en_name": "al qaddahiyah",
+    "full_name": "al qaddahiyah (القداحية)",
+    "lat": 31.6,
+    "lng": 15.05
+  },
+  {
+    "slug": "1476733_ly_al-qatrun-(القطرون).html",
+    "ar_name": "القطرون",
+    "en_name": "al qatrun",
+    "full_name": "al qatrun (القطرون)",
+    "lat": 24.9333,
+    "lng": 14.65
+  },
+  {
+    "slug": "1476738_ly_al-qubbah-(القبة).html",
+    "ar_name": "القبة",
+    "en_name": "al qubbah",
+    "full_name": "al qubbah (القبة)",
+    "lat": 32.76,
+    "lng": 22.24
+  },
+  {
+    "slug": "1478503_ly_Alriyayna-(الرياينة).html",
+    "ar_name": "الرياينة",
+    "en_name": "Alriyayna",
+    "full_name": "Alriyayna (الرياينة)",
+    "lat": 31.9833,
+    "lng": 12.3667
+  },
+  {
+    "slug": "2798126_ly_alsamah-(حقل-السماح-1).html",
+    "ar_name": "حقل السماح 1",
+    "en_name": "alsamah",
+    "full_name": "alsamah (حقل السماح 1)",
+    "lat": 28.0,
+    "lng": 18.5667
+  },
+  {
+    "slug": "2798127_ly_alsamah-(حقل-السماح-2).html",
+    "ar_name": "حقل السماح 2",
+    "en_name": "alsamah",
+    "full_name": "alsamah (حقل السماح 2)",
+    "lat": 28.0,
+    "lng": 18.5667
+  },
+  {
+    "slug": "1476776_ly_an-nufaliyah-(النوفلية).html",
+    "ar_name": "النوفلية",
+    "en_name": "an nufaliyah",
+    "full_name": "an nufaliyah (النوفلية)",
+    "lat": 30.7667,
+    "lng": 17.8333
+  },
+  {
+    "slug": "1476804_ly_ar-rujban-(الرجبان).html",
+    "ar_name": "الرجبان",
+    "en_name": "ar rujban",
+    "full_name": "ar rujban (الرجبان)",
+    "lat": 31.9167,
+    "lng": 12.0833
+  },
+  {
+    "slug": "1476834_ly_ash-shuwayrif-(الشويريف).html",
+    "ar_name": "الشويريف",
+    "en_name": "ash shuwayrif",
+    "full_name": "ash shuwayrif (الشويريف)",
+    "lat": 30.1167,
+    "lng": 14.5833
+  },
+  {
+    "slug": "1476868_ly_awbari-(اوباري).html",
+    "ar_name": "اوباري",
+    "en_name": "awbari",
+    "full_name": "awbari (اوباري)",
+    "lat": 26.5833,
+    "lng": 12.7833
+  },
+  {
+    "slug": "1476869_ly_awjilah-(اوجلة).html",
+    "ar_name": "اوجلة",
+    "en_name": "awjilah",
+    "full_name": "awjilah (اوجلة)",
+    "lat": 29.1333,
+    "lng": 21.2833
+  },
+  {
+    "slug": "1476976_ly_bani-walid-(بني-وليد).html",
+    "ar_name": "بني وليد",
+    "en_name": "bani walid",
+    "full_name": "bani walid (بني وليد)",
+    "lat": 31.7566,
+    "lng": 13.9942
+  },
+  {
+    "slug": "1477046_ly_brach-(براك).html",
+    "ar_name": "براك",
+    "en_name": "brach",
+    "full_name": "brach (براك)",
+    "lat": 27.5496,
+    "lng": 14.2714
+  },
+  {
+    "slug": "1477127_ly_dirj-(درج).html",
+    "ar_name": "درج",
+    "en_name": "dirj",
+    "full_name": "dirj (درج)",
+    "lat": 30.1667,
+    "lng": 10.4667
+  },
+  {
+    "slug": "1477378_ly_gadames-(غدامس).html",
+    "ar_name": "غدامس",
+    "en_name": "gadames",
+    "full_name": "gadames (غدامس)",
+    "lat": 30.1333,
+    "lng": 9.5
+  },
+  {
+    "slug": "1477431_ly_ghat-(غات).html",
+    "ar_name": "غات",
+    "en_name": "ghat",
+    "full_name": "ghat (غات)",
+    "lat": 24.9647,
+    "lng": 10.1728
+  },
+  {
+    "slug": "1477503_ly_hon-(هون).html",
+    "ar_name": "هون",
+    "en_name": "hon",
+    "full_name": "hon (هون)",
+    "lat": 29.1268,
+    "lng": 15.9477
+  },
+  {
+    "slug": "1477412_ly_Jakharrad-(اجخرة).html",
+    "ar_name": "اجخرة",
+    "en_name": "Jakharrad",
+    "full_name": "Jakharrad (اجخرة)",
+    "lat": 29.35,
+    "lng": 21.1333
+  },
+  {
+    "slug": "1477521_ly_jalu-(جالو).html",
+    "ar_name": "جالو",
+    "en_name": "jalu",
+    "full_name": "jalu (جالو)",
+    "lat": 29.0333,
+    "lng": 21.55
+  },
+  {
+    "slug": "1477616_ly_marada-(مرادة).html",
+    "ar_name": "مرادة",
+    "en_name": "marada",
+    "full_name": "marada (مرادة)",
+    "lat": 29.2167,
+    "lng": 19.2
+  },
+  {
+    "slug": "1477631_ly_martuba-(مرتوبة).html",
+    "ar_name": "مرتوبة",
+    "en_name": "martuba",
+    "full_name": "martuba (مرتوبة)",
+    "lat": 32.55,
+    "lng": 22.75
+  },
+  {
+    "slug": "2797593_ly_masus-(مسوس).html",
+    "ar_name": "مسوس",
+    "en_name": "masus",
+    "full_name": "masus (مسوس)",
+    "lat": 31.3167,
+    "lng": 20.9167
+  },
+  {
+    "slug": "1477682_ly_mizdah-(مزدة).html",
+    "ar_name": "مزدة",
+    "en_name": "mizdah",
+    "full_name": "mizdah (مزدة)",
+    "lat": 31.4442,
+    "lng": 12.9803
+  },
+  {
+    "slug": "1477692_ly_murzuq-(مرزق).html",
+    "ar_name": "مرزق",
+    "en_name": "murzuq",
+    "full_name": "murzuq (مرزق)",
+    "lat": 25.9155,
+    "lng": 13.9184
+  },
+  {
+    "slug": "1477693_ly_musaid-(امساعد).html",
+    "ar_name": "امساعد",
+    "en_name": "musaid",
+    "full_name": "musaid (امساعد)",
+    "lat": 31.5,
+    "lng": 25.05
+  },
+  {
+    "slug": "1478491_ly_naher-(النهر-الصناعي).html",
+    "ar_name": "النهر الصناعي",
+    "en_name": "naher",
+    "full_name": "naher (النهر الصناعي)",
+    "lat": 28.0,
+    "lng": 16.0
+  },
+  {
+    "slug": "1478049_ly_ras-ajdyer-(راس-جدير).html",
+    "ar_name": "راس جدير",
+    "en_name": "ras ajdyer",
+    "full_name": "ras ajdyer (راس جدير)",
+    "lat": 33.15,
+    "lng": 11.5667
+  },
+  {
+    "slug": "1478059_ly_ras-lanuf-(راس-لانوف).html",
+    "ar_name": "راس لانوف",
+    "en_name": "ras lanuf",
+    "full_name": "ras lanuf (راس لانوف)",
+    "lat": 30.5,
+    "lng": 18.5667
+  },
+  {
+    "slug": "1478078_ly_sabri-(الصابري).html",
+    "ar_name": "الصابري",
+    "en_name": "sabri",
+    "full_name": "sabri (الصابري)",
+    "lat": 32.1333,
+    "lng": 20.0833
+  },
+  {
+    "slug": "1478112_ly_shahat-(شحات).html",
+    "ar_name": "شحات",
+    "en_name": "shahat",
+    "full_name": "shahat (شحات)",
+    "lat": 32.8056,
+    "lng": 21.8622
+  },
+  {
+    "slug": "1478114_ly_shakshuk-(شكشوك).html",
+    "ar_name": "شكشوك",
+    "en_name": "shakshuk",
+    "full_name": "shakshuk (شكشوك)",
+    "lat": 31.95,
+    "lng": 12.1167
+  },
+  {
+    "slug": "2798188_ly_Suluq-(سلوق).html",
+    "ar_name": "سلوق",
+    "en_name": "Suluq",
+    "full_name": "Suluq (سلوق)",
+    "lat": 31.6682,
+    "lng": 20.2521
+  },
+  {
+    "slug": "1478245_ly_tarhuna-(ترهونة).html",
+    "ar_name": "ترهونة",
+    "en_name": "tarhuna",
+    "full_name": "tarhuna (ترهونة)",
+    "lat": 32.435,
+    "lng": 13.6332
+  },
+  {
+    "slug": "2797933_ly_Tazirbu_2-(تازربو_فجر2).html",
+    "ar_name": "تازربو_فجر2",
+    "en_name": "Tazirbu_2",
+    "full_name": "Tazirbu_2 (تازربو_فجر2)",
+    "lat": 25.6833,
+    "lng": 21.1333
+  },
+  {
+    "slug": "2798183_ly_TIBISTI-(حقل-تيبستي).html",
+    "ar_name": "حقل تيبستي",
+    "en_name": "TIBISTI",
+    "full_name": "TIBISTI (حقل تيبستي)",
+    "lat": 28.5,
+    "lng": 17.5
+  },
+  {
+    "slug": "2798004_ly_Tmassah-(تمسة_فجر2).html",
+    "ar_name": "تمسة_فجر2",
+    "en_name": "Tmassah",
+    "full_name": "Tmassah (تمسة_فجر2)",
+    "lat": 26.3833,
+    "lng": 15.75
+  },
+  {
+    "slug": "2797441_ly_Waddan-(ودان).html",
+    "ar_name": "ودان",
+    "en_name": "Waddan",
+    "full_name": "Waddan (ودان)",
+    "lat": 29.16,
+    "lng": 16.15
+  },
+  {
+    "slug": "2797985_ly_Wafa-Field-(حقل-الوفاء).html",
+    "ar_name": "حقل الوفاء",
+    "en_name": "Wafa Field",
+    "full_name": "Wafa Field (حقل الوفاء)",
+    "lat": 29.5,
+    "lng": 10.0
+  },
+  {
+    "slug": "1478487_ly_zillah-(زلة).html",
+    "ar_name": "زلة",
+    "en_name": "zillah",
+    "full_name": "zillah (زلة)",
+    "lat": 28.55,
+    "lng": 17.55
+  }
+]
