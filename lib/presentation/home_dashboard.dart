@@ -16,7 +16,7 @@ import 'qibla_screen.dart';
 import 'quran_screen.dart';
 import 'ruqyah_screen.dart';
 import 'settings_screen.dart';
-import 'tasbeeh_screen.dart';
+
 import 'widgets/city_picker_sheet.dart';
 
 class TaybahDashboard extends StatefulWidget {
@@ -60,7 +60,6 @@ class TaybahDashboardState extends State<TaybahDashboard> {
       const QuranScreen(),
       const PrayerScreen(),
       const AdhkarScreen(),
-      const TasbeehScreen(),
     ];
 
     return Scaffold(
@@ -108,11 +107,6 @@ class TaybahDashboardState extends State<TaybahDashboard> {
         'label': 'الأذكار',
         'icon': Icons.auto_stories_rounded,
         'unselected': Icons.auto_stories_outlined,
-      },
-      {
-        'label': 'المسبحة',
-        'icon': Icons.touch_app_rounded,
-        'unselected': Icons.touch_app_outlined,
       },
     ];
 
