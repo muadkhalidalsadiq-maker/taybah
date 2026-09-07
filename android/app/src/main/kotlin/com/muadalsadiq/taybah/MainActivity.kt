@@ -1,4 +1,4 @@
-package com.example.taybah
+package com.muadalsadiq.taybah
 
 import io.flutter.embedding.android.FlutterActivity
 
