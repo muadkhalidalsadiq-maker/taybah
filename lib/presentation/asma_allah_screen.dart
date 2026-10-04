@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/brand.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
 
@@ -222,7 +223,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                           color: TaybahColors.gold.withAlpha(40),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.auto_awesome_rounded, color: TaybahColors.goldLight, size: 24),
+                        child: const AsmaAllahIcon(size: 26, color: TaybahColors.goldLight),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

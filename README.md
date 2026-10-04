@@ -1,17 +1,22 @@
-# taybah
+# طيبة للأذكار والصلاة
 
-A new Flutter project.
+تطبيق إسلامي (Flutter): مواقيت الصلاة في ليبيا، الأذكار، القرآن الكريم برواية قالون (نصاً وصوتاً)، القبلة، التسبيح، أسماء الله الحسنى، والرقية الشرعية.
 
-## Getting Started
+## مواقيت الصلاة
+- تعمل **بدون إنترنت**: محرك حساب داخلي (`lib/data/prayer_calculator.dart`) معاير على موقع «الأوائل»
+  (زاوية الفجر 18.5° والعشاء 18.5° مع فروق التمكين المستعملة في الموقع). الفرق لا يتجاوز دقيقة.
+- عند توفر الإنترنت يُخزَّن جدول الأسبوع من موقع الأوائل ويُستعمل كما هو (مطابقة تامة).
+- التنبيهات تُجدول لثمانية أيام قادمة، كل يوم بميقاته.
 
-This project is a starting point for a Flutter application.
+## القرآن الصوتي
+مصاحف مرتلة برواية قالون من mp3quran.net (`lib/data/quran_audio.dart`)، القارئ الافتراضي: الدوكالي محمد العالم.
 
-A few resources to get you started if this is your first Flutter project:
+## الهوية البصرية
+انظر `brand/README.md`.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## التشغيل
+```
+flutter pub get
+flutter test
+flutter run
+```

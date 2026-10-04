@@ -56,7 +56,15 @@ class _PrayerScreenState extends State<PrayerScreen>
 
     // Refresh countdown every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted && _timings.isNotEmpty) {
+      if (!mounted) return;
+      // عند دخول يوم جديد نعيد تحميل مواقيت اليوم الجديد تلقائياً
+      final today = DateTime.now().day;
+      if (_loadedDay != null && _loadedDay != today) {
+        _loadedDay = today;
+        _loadPrayerTimes();
+        return;
+      }
+      if (_timings.isNotEmpty) {
         setState(() {});
       }
     });
@@ -177,7 +185,10 @@ class _PrayerScreenState extends State<PrayerScreen>
     await _loadPrayerTimes();
   }
 
+  int? _loadedDay;
+
   Future<void> _loadPrayerTimes() async {
+    _loadedDay = DateTime.now().day;
     setState(() => _isLoading = true);
     final times = await PrayerApi.getPrayerTimesFromAlAwail(
       slug: _citySlug,

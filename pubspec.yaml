@@ -1,7 +1,7 @@
 name: taybah
-description: "تطبيق طيبة - تطبيق إسلامي شامل"
+description: "طيبة للأذكار والصلاة - مواقيت الصلاة، الأذكار، والقرآن الكريم برواية قالون"
 publish_to: 'none'
-version: 2.0.0+1
+version: 2.1.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

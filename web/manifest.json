@@ -1,11 +1,11 @@
 {
-    "name": "taybah",
-    "short_name": "taybah",
+    "name": "طيبة للأذكار والصلاة",
+    "short_name": "طيبة",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#183D24",
+    "theme_color": "#183D24",
+    "description": "طيبة للأذكار والصلاة: مواقيت الصلاة في ليبيا، الأذكار، والقرآن الكريم برواية قالون.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

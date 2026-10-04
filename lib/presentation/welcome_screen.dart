@@ -36,6 +36,31 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   const Spacer(flex: 3),
 
+                  // شعار طيبة
+                  Container(
+                    width: 112,
+                    height: 112,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF183D24).withAlpha(60),
+                          blurRadius: 24,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: Image.asset(
+                        'assets/images/app_icon.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+
                   // Title: "طيبة"
                   Text(
                     'طيبة',
@@ -58,7 +83,20 @@ class WelcomeScreen extends StatelessWidget {
                     color: lineAccentColor,
                   ),
 
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 10),
+
+                  Text(
+                    'للأذكار والصلاة',
+                    style: GoogleFonts.cairo(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFB8922B),
+                      height: 1.2,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 26),
 
                   // Subtitle: "حياكم الله"
                   Text(

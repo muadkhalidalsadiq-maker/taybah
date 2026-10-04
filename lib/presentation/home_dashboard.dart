@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/brand.dart';
 import '../core/theme.dart';
 import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
@@ -333,7 +334,15 @@ class _HomeTabState extends State<HomeTab> {
     super.initState();
     _handleFirstLaunchAndLoad();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted && _timings.isNotEmpty) {
+      if (!mounted) return;
+      // عند دخول يوم جديد نعيد تحميل مواقيت اليوم الجديد تلقائياً
+      final today = DateTime.now().day;
+      if (_loadedDay != null && _loadedDay != today) {
+        _loadedDay = today;
+        _loadData();
+        return;
+      }
+      if (_timings.isNotEmpty) {
         setState(() {});
       }
     });
@@ -366,7 +375,10 @@ class _HomeTabState extends State<HomeTab> {
     await _loadData();
   }
 
+  int? _loadedDay;
+
   Future<void> _loadData() async {
+    _loadedDay = DateTime.now().day;
     final name = await SharedPrefsHelper.instance.getSelectedCityName();
     final slug = await SharedPrefsHelper.instance.getSelectedCitySlug();
     final summer = await SharedPrefsHelper.instance.isSummerTime();
@@ -1144,6 +1156,7 @@ class _HomeTabState extends State<HomeTab> {
                   _buildQuickCard(
                     title: 'أسماء الله الحسنى',
                     icon: Icons.auto_awesome_rounded,
+                    customIcon: const AsmaAllahIcon(size: 26),
                     gradient: const [Color(0xFFB45309), Color(0xFFF59E0B)],
                     onTap: () {
                       Navigator.push(
@@ -1633,6 +1646,7 @@ class _HomeTabState extends State<HomeTab> {
     required IconData icon,
     required List<Color> gradient,
     required VoidCallback onTap,
+    Widget? customIcon,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -1673,7 +1687,9 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ],
                 ),
-                child: Icon(icon, color: Colors.white, size: 22),
+                child: Center(
+                  child: customIcon ?? Icon(icon, color: Colors.white, size: 22),
+                ),
               ),
               const SizedBox(height: 6),
               Text(

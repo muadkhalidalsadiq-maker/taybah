@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ألوان هوية طيبة -->
+    <color name="ic_launcher_background">#183D24</color>
+    <color name="taybah_green">#183D24</color>
+    <color name="taybah_gold">#D4AF37</color>
+</resources>

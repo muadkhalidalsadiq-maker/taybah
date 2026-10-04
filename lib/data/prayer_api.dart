@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'asset_loader.dart';
+import 'prayer_calculator.dart';
 import 'shared_prefs_helper.dart';
 
 class PrayerApi {
@@ -24,19 +26,138 @@ class PrayerApi {
     'Isha': 15,
   };
 
-  /// Fetches official Al-Awail prayer times with local caching fallback
-  static Future<Map<String, dynamic>> getPrayerTimesFromAlAwail({
+  /// ليبيا تعمل بتوقيت ثابت UTC+2 (وضع «صيفي» في موقع الأوائل).
+  static const double libyaUtcOffset = 2.0;
+
+  /// مصدر آخر مواقيت تم إرجاعها: 'alawail' (من الموقع/المخزن) أو 'calc' (حساب داخلي).
+  static String lastSource = 'calc';
+
+  static String dateKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  /// رقم المدينة في موقع الأوائل (الجزء الأول من الرابط) — ثابت مهما كان ترميز الرابط.
+  static String _cityId(String slug) {
+    final i = slug.indexOf('_');
+    return i > 0 ? slug.substring(0, i) : slug;
+  }
+
+  static Future<Map<String, dynamic>?> _findCityBySlug(String slug) async {
+    try {
+      final id = _cityId(slug);
+      final cities = await AssetLoader.loadCitiesLibya();
+      for (final c in cities) {
+        if (_cityId((c['slug'] ?? '').toString()) == id) return c;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// حساب المواقيت داخل التطبيق بدون إنترنت (معاير على موقع الأوائل).
+  static Future<Map<String, dynamic>> calculateOffline({
     String slug = defaultCitySlug,
-    String cityName = defaultCityName,
+    DateTime? date,
     bool isSummer = true,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final summerParam = isSummer ? '2' : '1';
-    final cacheKey = 'alawail_prayer_${slug}_s$summerParam';
+    final city = await _findCityBySlug(slug);
+    final lat = (city?['lat'] as num?)?.toDouble() ?? 31.9317;
+    final lng = (city?['lng'] as num?)?.toDouble() ?? 12.2533;
+    final name = (city?['ar_name'] ?? '').toString();
+    final usesSecondFajr = name.contains('فجر2');
+    return PrayerCalculator.compute(
+      date ?? DateTime.now(),
+      lat,
+      lng,
+      tzHours: isSummer ? libyaUtcOffset : libyaUtcOffset - 1.0,
+      fajrAngle: usesSecondFajr
+          ? PrayerCalculator.secondFajrAngle
+          : PrayerCalculator.defaultFajrAngle,
+    );
+  }
 
+  static String _daysCacheKey(String slug, bool isSummer) =>
+      'alawail_days_${_cityId(slug)}_s${isSummer ? '2' : '1'}';
+
+  static Map<String, Map<String, dynamic>> _readDaysCache(
+    SharedPreferences prefs,
+    String key,
+  ) {
+    final out = <String, Map<String, dynamic>>{};
+    final raw = prefs.getString(key);
+    if (raw == null) return out;
+    try {
+      final decoded = json.decode(raw);
+      if (decoded is Map) {
+        decoded.forEach((k, v) {
+          if (v is Map) out[k.toString()] = Map<String, dynamic>.from(v);
+        });
+      }
+    } catch (_) {}
+    return out;
+  }
+
+  static int _toMinutes(dynamic timeStr) => _parseTimeToSeconds(timeStr) ~/ 60;
+
+  /// يتأكد أن المواقيت المقروءة من الموقع منطقية بمقارنتها بالحساب الداخلي
+  /// (يحمي من تغيّر تصميم الصفحة أو قراءة أرقام خاطئة).
+  static bool _isPlausible(
+    Map<String, dynamic> parsed,
+    Map<String, dynamic> calc,
+  ) {
+    const required = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    for (final key in required) {
+      final p = parsed[key]?.toString() ?? '';
+      final c = calc[key]?.toString() ?? '';
+      if (!p.contains(':') || !c.contains(':')) return false;
+      final diff = (_toMinutes(p) - _toMinutes(c)).abs();
+      final limit = key == 'Fajr' ? 30 : 8;
+      if (diff > limit) return false;
+    }
+    return true;
+  }
+
+  static String _pad(String timeStr) {
+    final parts = timeStr.trim().split(':');
+    if (parts.length < 2) return timeStr;
+    return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+  }
+
+  /// يقرأ الجدول الأسبوعي من صفحة الأوائل: تاريخ ثم ستة أوقات.
+  static Map<String, Map<String, dynamic>> _parseWeekRows(String html) {
+    final out = <String, Map<String, dynamic>>{};
+    const keys = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    final dateRe = RegExp(r'(20\d{2})-(\d{2})-(\d{2})');
+    final timeRe = RegExp(r'\b(\d{1,2}):(\d{2})\b');
+    final matches = dateRe.allMatches(html).toList();
+    for (var i = 0; i < matches.length; i++) {
+      final start = matches[i].end;
+      var end = i + 1 < matches.length ? matches[i + 1].start : html.length;
+      if (end - start > 1500) end = start + 1500;
+      if (end <= start) continue;
+      final chunk = html.substring(start, end);
+      final times = timeRe.allMatches(chunk).take(6).toList();
+      if (times.length < 6) continue;
+      final row = <String, dynamic>{};
+      for (var k = 0; k < 6; k++) {
+        row[keys[k]] = _pad('${times[k].group(1)}:${times[k].group(2)}');
+      }
+      out[matches[i].group(0)!] = row;
+    }
+    return out;
+  }
+
+  /// يجلب مواقيت اليوم + الأسبوع من موقع الأوائل ويخزنها حسب التاريخ.
+  /// لا يرمي أي استثناء؛ عند الفشل يرجع المخزن كما هو.
+  static Future<Map<String, Map<String, dynamic>>> _refreshFromAlAwail({
+    required String slug,
+    required String cityName,
+    required bool isSummer,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final cacheKey = _daysCacheKey(slug, isSummer);
+    final days = _readDaysCache(prefs, cacheKey);
     try {
       final cleanSlug = slug.contains('?') ? slug.split('?')[0] : slug;
-      final url = Uri.parse('$_baseUrl$cleanSlug?s=$summerParam');
+      final url = Uri.parse('$_baseUrl$cleanSlug?s=${isSummer ? '2' : '1'}');
       final response = await http.get(
         url,
         headers: {
@@ -44,70 +165,114 @@ class PrayerApi {
               'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml',
         },
-      ).timeout(const Duration(seconds: 6));
+      ).timeout(const Duration(seconds: 5));
 
-      if (response.statusCode == 200) {
-        final html = utf8.decode(response.bodyBytes, allowMalformed: true);
-        final timings = _parseAlAwailHtml(html);
+      if (response.statusCode != 200) return days;
+      final html = utf8.decode(response.bodyBytes, allowMalformed: true);
+      final now = DateTime.now();
 
-        if (timings.isNotEmpty) {
-          final toCache = {
-            'timings': timings,
-            'cityName': cityName,
-            'slug': cleanSlug,
-            'isSummer': isSummer,
-            'date': DateTime.now().toIso8601String(),
-          };
-          await prefs.setString(cacheKey, json.encode(toCache));
-          return await applyManualOffsets(timings);
+      // 1) الجدول الأسبوعي
+      final week = _parseWeekRows(html);
+      for (final entry in week.entries) {
+        final date = DateTime.tryParse(entry.key);
+        if (date == null) continue;
+        final calc = await calculateOffline(
+          slug: slug,
+          date: date,
+          isSummer: isSummer,
+        );
+        if (_isPlausible(entry.value, calc)) days[entry.key] = entry.value;
+      }
+
+      // 2) مواقيت اليوم (القراءة الأدق من جدول اليوم)
+      final todayParsed = _parseAlAwailHtml(html);
+      if (todayParsed.isNotEmpty) {
+        final calc = await calculateOffline(
+          slug: slug,
+          date: now,
+          isSummer: isSummer,
+        );
+        if (_isPlausible(todayParsed, calc)) {
+          final fixed = <String, dynamic>{};
+          for (final key in PrayerCalculator.prayerKeys) {
+            final v = todayParsed[key] ?? calc[key];
+            if (v != null) fixed[key] = _pad(v.toString());
+          }
+          days[dateKey(now)] = fixed;
         }
       }
-    } catch (e) {
-      // Network error or timeout: fall back to cache
+
+      // حذف الأيام القديمة من المخزن
+      final yesterday = dateKey(now.subtract(const Duration(days: 1)));
+      days.removeWhere((k, _) => k.compareTo(yesterday) < 0);
+      await prefs.setString(cacheKey, json.encode(days));
+    } catch (_) {
+      // لا يوجد إنترنت أو انتهت المهلة: نكمل بالمخزن أو الحساب الداخلي
     }
-
-    // Cache fallback
-    final cached = prefs.getString(cacheKey);
-    if (cached != null) {
-      try {
-        final decoded = json.decode(cached);
-        if (decoded['timings'] != null) {
-          final t = Map<String, dynamic>.from(decoded['timings']);
-          return await applyManualOffsets(t);
-        }
-      } catch (_) {}
-    }
-
-    // Offline Al-Awail fallback times for Libya (+1 hour offset for summer)
-    final fallback = isSummer
-        ? getOfflineSummerFallbackTimes()
-        : getOfflineFallbackTimes();
-    return await applyManualOffsets(fallback);
+    return days;
   }
 
-  /// Summer time fallback (+1 hour)
-  static Map<String, dynamic> getOfflineSummerFallbackTimes() {
-    return {
-      'Fajr': '05:25',
-      'Sunrise': '06:50',
-      'Dhuhr': '13:13',
-      'Asr': '16:42',
-      'Maghrib': '19:32',
-      'Isha': '20:53',
-    };
+  /// مواقيت اليوم: تعمل بدون إنترنت دائماً.
+  /// الترتيب: المخزن من موقع الأوائل ← جلب من الموقع (إن وُجد نت) ← حساب داخلي معاير.
+  static Future<Map<String, dynamic>> getPrayerTimesFromAlAwail({
+    String slug = defaultCitySlug,
+    String cityName = defaultCityName,
+    bool isSummer = true,
+  }) async {
+    final now = DateTime.now();
+    final todayKey = dateKey(now);
+    final tomorrowKey = dateKey(now.add(const Duration(days: 1)));
+    Map<String, dynamic>? result;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final days = _readDaysCache(prefs, _daysCacheKey(slug, isSummer));
+      result = days[todayKey];
+
+      if (result == null) {
+        final fresh = await _refreshFromAlAwail(
+          slug: slug,
+          cityName: cityName,
+          isSummer: isSummer,
+        );
+        result = fresh[todayKey];
+      } else if (!days.containsKey(tomorrowKey)) {
+        // المخزن ينتهي اليوم: نحدّثه في الخلفية بدون تعطيل الواجهة
+        unawaited(_refreshFromAlAwail(
+          slug: slug,
+          cityName: cityName,
+          isSummer: isSummer,
+        ));
+      }
+    } catch (_) {}
+
+    lastSource = result != null ? 'alawail' : 'calc';
+    final Map<String, dynamic> finalTimings = result ??
+        await calculateOffline(slug: slug, date: now, isSummer: isSummer);
+    return await applyManualOffsets(finalTimings);
   }
 
-  /// Winter time fallback
-  static Map<String, dynamic> getOfflineFallbackTimes() {
-    return {
-      'Fajr': '04:25',
-      'Sunrise': '05:50',
-      'Dhuhr': '12:13',
-      'Asr': '15:42',
-      'Maghrib': '18:32',
-      'Isha': '19:53',
-    };
+  /// مواقيت أي يوم للمدينة المختارة (تستعمل لجدولة تنبيهات الأيام القادمة).
+  static Future<Map<String, dynamic>> getTimingsForDate(DateTime date) async {
+    final slug = await SharedPrefsHelper.instance.getSelectedCitySlug();
+    final isSummer = await SharedPrefsHelper.instance.isSummerTime();
+    Map<String, dynamic>? result;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final days = _readDaysCache(prefs, _daysCacheKey(slug, isSummer));
+      result = days[dateKey(date)];
+    } catch (_) {}
+    final Map<String, dynamic> finalTimings = result ??
+        await calculateOffline(slug: slug, date: date, isSummer: isSummer);
+    return await applyManualOffsets(finalTimings);
   }
+
+  /// للتوافق مع النسخ السابقة: مواقيت احتياطية محسوبة للمدينة الافتراضية.
+  static Map<String, dynamic> getOfflineSummerFallbackTimes() =>
+      PrayerCalculator.compute(DateTime.now(), 31.9317, 12.2533, tzHours: 2.0);
+
+  static Map<String, dynamic> getOfflineFallbackTimes() =>
+      PrayerCalculator.compute(DateTime.now(), 31.9317, 12.2533, tzHours: 1.0);
 
   /// Applies user manual minute adjustments (+/- minutes)
   static Future<Map<String, dynamic>> applyManualOffsets(

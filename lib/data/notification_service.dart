@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:ui' show Color;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'prayer_api.dart';
 
 class NotificationService {
   NotificationService._();
@@ -34,7 +36,7 @@ class NotificationService {
       tz.initializeTimeZones();
 
       const androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('ic_stat_taybah');
 
       const darwinSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
@@ -102,6 +104,16 @@ class NotificationService {
         if (androidImpl != null) {
           final granted =
               await androidImpl.requestNotificationsPermission();
+          // إذن المنبهات الدقيقة (أندرويد 12+) حتى يصل الأذان في وقته بالدقيقة
+          try {
+            final canExact =
+                await androidImpl.canScheduleExactNotifications();
+            if (canExact == false) {
+              await androidImpl.requestExactAlarmsPermission();
+            }
+          } catch (e) {
+            debugPrint('Exact alarm permission request failed: $e');
+          }
           return granted ?? false;
         }
       } else if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
@@ -155,6 +167,8 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'طيبة',
+      icon: 'ic_stat_taybah',
+      color: Color(0xFF183D24),
       enableVibration: true,
       playSound: true,
       sound: RawResourceAndroidNotificationSound('adhan'),
@@ -208,11 +222,29 @@ class NotificationService {
     await playAdhanAudio();
   }
 
-  /// Schedule daily notifications for the 5 prayers + sunrise
-  Future<void> scheduleDailyPrayers(Map<String, dynamic> timings) async {
-    if (timings.isEmpty) return;
-    await init();
+  /// عدد الأيام القادمة التي تُجدول تنبيهاتها بمواقيت كل يوم بدقة.
+  static const int _scheduleDays = 8;
 
+  /// يجدول تنبيهات الصلوات الخمس + الشروق لعدة أيام قادمة،
+  /// كل يوم بميقاته الصحيح (بدل تكرار ميقات اليوم نفسه كل يوم).
+  Future<void> scheduleDailyPrayers(Map<String, dynamic> timings) async {
+    if (timings.isEmpty || _isScheduling) return;
+    _isScheduling = true;
+    try {
+      await init();
+      await _scheduleDailyPrayersInternal(timings);
+    } catch (e) {
+      debugPrint('Error scheduling prayers: $e');
+    } finally {
+      _isScheduling = false;
+    }
+  }
+
+  bool _isScheduling = false;
+
+  Future<void> _scheduleDailyPrayersInternal(
+    Map<String, dynamic> timings,
+  ) async {
     final prayerData = [
       {'key': 'Fajr', 'name': 'الفجر', 'id': 101},
       {'key': 'Sunrise', 'name': 'الشروق', 'id': 102},
@@ -223,54 +255,114 @@ class NotificationService {
     ];
 
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isIOS = !kIsWeb && (Platform.isIOS || Platform.isMacOS);
 
-    for (final p in prayerData) {
-      final key = p['key'] as String;
-      final name = p['name'] as String;
-      final id = p['id'] as int;
-
-      final isEnabled = await isPrayerNotificationEnabled(key);
-      if (!isEnabled) {
-        await _notificationsPlugin.cancel(id);
+    // مواقيت كل يوم من الأيام القادمة (اليوم = المواقيت المعروضة على الشاشة)
+    final dayTimings = <Map<String, dynamic>>[];
+    for (var d = 0; d <= _scheduleDays; d++) {
+      if (d == 0) {
+        dayTimings.add(timings);
         continue;
       }
+      try {
+        dayTimings.add(
+          await PrayerApi.getTimingsForDate(today.add(Duration(days: d))),
+        );
+      } catch (_) {
+        dayTimings.add(timings);
+      }
+    }
 
-      final timeStr = timings[key]?.toString();
-      if (timeStr == null || !timeStr.contains(':')) continue;
+    for (var pIdx = 0; pIdx < prayerData.length; pIdx++) {
+      final p = prayerData[pIdx];
+      final key = p['key'] as String;
+      final name = p['name'] as String;
+      final legacyId = p['id'] as int;
 
-      final parts = timeStr.split(':');
-      final hour = int.tryParse(parts[0]) ?? 0;
-      final minute = int.tryParse(parts[1]) ?? 0;
-
-      // Calculate scheduled date in local timezone
-      var scheduledDate = DateTime(now.year, now.month, now.day, hour, minute);
-      if (scheduledDate.isBefore(now)) {
-        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      // إلغاء كل ما سبق جدولته لهذه الصلاة
+      await _safeCancel(legacyId);
+      for (var d = 0; d < _scheduleDays; d++) {
+        await _safeCancel(1000 + d * 10 + pIdx);
       }
 
-      final tzScheduled = tz.TZDateTime.from(scheduledDate, tz.local);
+      final isEnabled = await isPrayerNotificationEnabled(key);
+      if (!isEnabled) continue;
 
-      try {
-        await _notificationsPlugin.zonedSchedule(
-          id,
-          'الله أكبر • حان الآن موعد أذان $name',
-          'حيّ على الصلاة، حيّ على الفلاح • تقبل الله طاعتكم',
-          tzScheduled,
-          _getAdhanNotificationDetails(),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.time,
+      for (var d = 0; d <= _scheduleDays; d++) {
+        final when = _dateTimeFor(today.add(Duration(days: d)), dayTimings[d][key]);
+        if (when == null || !when.isAfter(now)) continue;
+
+        final isFallbackDay = d == _scheduleDays;
+        // اليوم الأخير: تنبيه يومي متكرر احتياطي إذا لم يُفتح التطبيق لمدة طويلة
+        // (على iOS المتكرر يبدأ من اليوم فيتكرر التنبيه، لذلك نتركه لأندرويد فقط)
+        if (isFallbackDay && isIOS) continue;
+
+        await _scheduleOne(
+          id: isFallbackDay ? legacyId : 1000 + d * 10 + pIdx,
+          title: 'الله أكبر • حان الآن موعد أذان $name',
+          body: 'حيّ على الصلاة، حيّ على الفلاح • تقبل الله طاعتكم',
+          when: when,
           payload: 'prayer_$key',
+          repeatDaily: isFallbackDay,
         );
-        debugPrint('Scheduled prayer $name at $timeStr (ID: $id)');
-      } catch (e) {
-        debugPrint('Error scheduling prayer $name: $e');
       }
     }
 
     // Also schedule daily Morning & Evening Azkar reminders
     await scheduleDailyAzkarReminders();
+  }
+
+  Future<void> _safeCancel(int id) async {
+    try {
+      await _notificationsPlugin.cancel(id);
+    } catch (_) {}
+  }
+
+  DateTime? _dateTimeFor(DateTime day, dynamic timeStr) {
+    final s = timeStr?.toString() ?? '';
+    if (!s.contains(':')) return null;
+    final parts = s.split(':');
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    return DateTime(day.year, day.month, day.day, hour, minute);
+  }
+
+  /// يجدول تنبيهاً واحداً بالوقت الدقيق، وإذا رفض النظام المنبهات الدقيقة
+  /// (أندرويد 12+ بدون إذن) يرجع للجدولة التقريبية بدل أن يفشل التنبيه.
+  Future<void> _scheduleOne({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime when,
+    required String payload,
+    bool repeatDaily = false,
+  }) async {
+    final tzScheduled = tz.TZDateTime.from(when, tz.local);
+    for (final mode in const [
+      AndroidScheduleMode.exactAllowWhileIdle,
+      AndroidScheduleMode.inexactAllowWhileIdle,
+    ]) {
+      try {
+        await _notificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tzScheduled,
+          _getAdhanNotificationDetails(),
+          androidScheduleMode: mode,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents:
+              repeatDaily ? DateTimeComponents.time : null,
+          payload: payload,
+        );
+        return;
+      } catch (e) {
+        debugPrint('Error scheduling notification $id ($mode): $e');
+      }
+    }
   }
 
   /// Schedule daily Morning & Evening Azkar reminders
@@ -319,7 +411,7 @@ class NotificationService {
           body,
           tzScheduled,
           _getAdhanNotificationDetails(),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
           matchDateTimeComponents: DateTimeComponents.time,

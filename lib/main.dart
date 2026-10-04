@@ -22,7 +22,7 @@ class TaybahApp extends StatelessWidget {
       child: Consumer<AppState>(
         builder: (context, appState, child) {
           return MaterialApp(
-            title: 'طيبة للاذكار والقران',
+            title: 'طيبة للأذكار والصلاة',
             debugShowCheckedModeBanner: false,
             theme: TaybahTheme.lightTheme,
             darkTheme: TaybahTheme.darkTheme,
