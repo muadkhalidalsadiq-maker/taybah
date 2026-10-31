@@ -4,6 +4,7 @@ import '../core/theme.dart';
 import '../data/asset_loader.dart';
 import '../data/quran_player.dart';
 import '../data/shared_prefs_helper.dart';
+import 'surah_reader_screen.dart';
 import 'widgets/quran_audio_bar.dart';
 import 'widgets/quran_mushaf_view.dart';
 
@@ -166,13 +167,14 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
           indicatorWeight: 3,
           labelColor: isDark ? TaybahColors.goldLight : TaybahColors.primary,
           unselectedLabelColor: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
-          labelStyle: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
-          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
+          labelStyle: GoogleFonts.cairo(fontSize: 14, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 14),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: const [
-            Tab(text: 'المصحف (صفحات)'),
-            Tab(text: 'السور (114)'),
-            Tab(text: 'الأجزاء (30)'),
-            Tab(text: 'البحث 🔍'),
+            Tab(text: 'المصحف'),
+            Tab(text: 'السور'),
+            Tab(text: 'الأجزاء'),
+            Tab(text: 'البحث'),
           ],
         ),
       ),
@@ -323,6 +325,13 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       onTap: () => _openSurah(surah),
+                      // ضغطة مطولة: قراءة السورة آية بآية
+                      onLongPress: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SurahReaderScreen(surahMeta: surah),
+                        ),
+                      ),
                       leading: Container(
                         width: 44,
                         height: 44,
@@ -420,7 +429,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
 
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? TaybahColors.darkSurface : Colors.white,
+            color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: isDark ? TaybahColors.darkBorder : TaybahColors.border),
           ),
@@ -536,7 +545,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? TaybahColors.darkSurface : Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: isDark ? TaybahColors.darkBorder : TaybahColors.border,

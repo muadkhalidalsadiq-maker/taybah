@@ -125,7 +125,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
   void _updateCityCoords(String cityName) {
     Map<String, dynamic>? match;
     for (final c in _cities) {
-      if (c['name'] == cityName) {
+      if (c['ar_name'] == cityName) {
         match = c;
         break;
       }
@@ -411,7 +411,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                               shape: BoxShape.circle,
                               gradient: RadialGradient(
                                 colors: [
-                                  isDark ? TaybahColors.darkSurfaceMuted : Colors.white,
+                                  TaybahColors.isDark ? TaybahColors.darkSurfaceMuted : Colors.white,
                                   isDark ? TaybahColors.darkSurface : TaybahColors.surfaceMuted,
                                 ],
                               ),
@@ -659,7 +659,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             final filtered = _cities.where((c) {
-              final name = (c['name'] ?? '').toString();
+              final name = (c['ar_name'] ?? '').toString();
               return name.contains(query);
             }).toList();
 
@@ -667,7 +667,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
               height: MediaQuery.of(ctx).size.height * 0.75,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDark ? TaybahColors.darkSurface : Colors.white,
+                color: TaybahColors.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -705,7 +705,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                       itemCount: filtered.length,
                       itemBuilder: (ctx, i) {
                         final city = filtered[i];
-                        final name = city['name'] ?? '';
+                        final name = (city['ar_name'] ?? '').toString();
                         final isSelected = name == _selectedCityName;
                         return ListTile(
                           title: Text(

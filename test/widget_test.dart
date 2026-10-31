@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hijri/hijri_calendar.dart';
 import 'package:taybah/core/theme.dart';
 import 'package:taybah/data/adhan_voices.dart';
 import 'package:taybah/data/prayer_calculator.dart';
@@ -63,5 +64,11 @@ void main() {
     expect(m('Dhuhr') < m('Asr'), isTrue);
     expect(m('Asr') < m('Maghrib'), isTrue);
     expect(m('Maghrib') < m('Isha'), isTrue);
+  });
+
+  test('التاريخ الهجري صحيح (أم القرى)', () {
+    final h = HijriCalendar.fromDate(DateTime(2026, 10, 31));
+    expect(h.hYear, 1448);
+    expect(h.hMonth, 5); // جمادى الأولى
   });
 }

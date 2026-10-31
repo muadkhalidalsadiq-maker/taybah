@@ -58,7 +58,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: const [
             BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, -4)),
@@ -315,7 +315,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
       borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: isDark ? TaybahColors.darkBorder : TaybahColors.border,

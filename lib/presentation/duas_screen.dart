@@ -58,7 +58,7 @@ class _DuasScreenState extends State<DuasScreen> {
                 return Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: TaybahColors.border),
                   ),

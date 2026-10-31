@@ -115,8 +115,8 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: TaybahColors.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -246,8 +246,8 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                       const SizedBox(width: 8),
                       Text(
                         _isSummerTime
-                            ? 'التوقيت الصيفي مفعل (الأوائل ?s=2)'
-                            : 'التوقيت الشتوي مفعل (الأوائل ?s=1)',
+                            ? 'التوقيت الصيفي مفعّل'
+                            : 'التوقيت الشتوي مفعّل',
                         style: GoogleFonts.cairo(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

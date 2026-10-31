@@ -100,7 +100,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -271,7 +271,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
                     ),
                     selected: isSelected,
                     selectedColor: TaybahColors.primaryAccent,
-                    backgroundColor: isDark ? TaybahColors.darkSurface : Colors.white,
+                    backgroundColor: TaybahColors.surface,
                     side: BorderSide(
                       color: isSelected
                           ? TaybahColors.gold
@@ -304,7 +304,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: isDark ? TaybahColors.darkSurface : Colors.white,
+                  color: TaybahColors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -351,7 +351,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
                 width: 230,
                 height: 230,
                 decoration: BoxDecoration(
-                  color: isDark ? TaybahColors.darkSurface : Colors.white,
+                  color: TaybahColors.surface,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isDark ? TaybahColors.darkBorder : TaybahColors.primaryLight,
@@ -441,7 +441,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
                     style: OutlinedButton.styleFrom(
                       backgroundColor: isCurrent
                           ? (isDark ? TaybahColors.darkSurfaceMuted : TaybahColors.primaryLight)
-                          : (isDark ? TaybahColors.darkSurface : Colors.white),
+                          : (TaybahColors.surface),
                       side: BorderSide(
                         color: isCurrent
                             ? TaybahColors.gold

@@ -459,7 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: TaybahColors.border),
             ),
@@ -487,8 +487,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             Text(
                               _isSummer
-                                  ? 'التوقيت الصيفي (الأوائل ?s=2)'
-                                  : 'التوقيت الشتوي (الأوائل ?s=1)',
+                                  ? 'التوقيت الصيفي'
+                                  : 'التوقيت الشتوي',
                               style: GoogleFonts.cairo(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -619,7 +619,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -706,7 +706,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -944,7 +944,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: TaybahColors.border),
             ),
@@ -1011,7 +1011,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -1122,7 +1122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -1135,9 +1135,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       width: 48,
                       height: 48,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: TaybahColors.surface,
                       ),
                       child: ClipOval(
                         child: Image.asset('assets/images/logo.png'),

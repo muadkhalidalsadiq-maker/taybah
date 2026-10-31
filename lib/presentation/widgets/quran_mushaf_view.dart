@@ -453,7 +453,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isDark ? TaybahColors.darkSurface : Colors.white,
+        color: TaybahColors.surface,
         border: Border(
           top: BorderSide(
             color: isDark ? TaybahColors.darkBorder : TaybahColors.border,

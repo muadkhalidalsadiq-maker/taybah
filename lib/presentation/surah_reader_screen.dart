@@ -104,7 +104,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           return Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -289,7 +289,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -440,7 +440,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           decoration: BoxDecoration(
             color: isTarget
                 ? (isDark ? const Color(0xFF1E3F28) : TaybahColors.primaryTint)
-                : (isDark ? TaybahColors.darkSurface : Colors.white),
+                : (TaybahColors.surface),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isTarget
@@ -534,7 +534,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(

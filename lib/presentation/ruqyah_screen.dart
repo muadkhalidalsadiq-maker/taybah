@@ -225,7 +225,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
         decoration: BoxDecoration(
           color: isDone
               ? (isDark ? const Color(0xFF0F2618) : const Color(0xFFE8F5E9))
-              : (isDark ? TaybahColors.darkSurface : Colors.white),
+              : (TaybahColors.surface),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isDone

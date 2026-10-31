@@ -135,7 +135,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       iconColor = TaybahColors.gold;
     } else if (categoryName.contains('المساء')) {
       icon = Icons.nights_stay_rounded;
-      iconColor = TaybahColors.primaryMedium;
+      iconColor = TaybahColors.isDark ? TaybahColors.mint : TaybahColors.primaryMedium;
     } else if (categoryName.contains('النوم')) {
       icon = Icons.bedtime_rounded;
       iconColor = const Color(0xFF6366F1);
@@ -155,7 +155,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: TaybahColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: TaybahColors.border),
       ),
@@ -267,7 +267,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
           // Progress Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            color: Colors.white,
+            color: TaybahColors.surface,
             child: Column(
               children: [
                 Row(
@@ -321,7 +321,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
 
                 return Container(
                   decoration: BoxDecoration(
-                    color: done ? TaybahColors.surfaceMuted : Colors.white,
+                    color: done ? TaybahColors.surfaceMuted : TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: done
