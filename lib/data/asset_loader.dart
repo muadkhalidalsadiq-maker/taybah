@@ -9,7 +9,6 @@ class AssetLoader {
   static List<dynamic>? _cachedHadith;
   static List<dynamic>? _cachedDuas;
   static List<dynamic>? _cachedNawafil;
-  static List<dynamic>? _cachedTasbeeh;
   static List<Map<String, dynamic>>? _cachedAsmaAllah;
   static Map<String, dynamic>? _cachedRuqyah;
 
@@ -77,12 +76,6 @@ class AssetLoader {
     return _cachedNawafil!;
   }
 
-  static Future<List<dynamic>> loadTasbeeh() async {
-    if (_cachedTasbeeh != null) return _cachedTasbeeh!;
-    final response = await rootBundle.loadString('assets/data/tasbeeh.json');
-    _cachedTasbeeh = json.decode(response);
-    return _cachedTasbeeh!;
-  }
 
   static Future<List<dynamic>> loadQuran() async {
     return loadQuranSurahs();

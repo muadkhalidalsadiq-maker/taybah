@@ -19,7 +19,6 @@ import 'qibla_screen.dart';
 import 'quran_screen.dart';
 import 'ruqyah_screen.dart';
 import 'settings_screen.dart';
-import 'tasbeeh_screen.dart';
 
 import 'widgets/city_picker_sheet.dart';
 
@@ -1196,19 +1195,6 @@ class _HomeTabState extends State<HomeTab> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const RuqyahScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildQuickCard(
-                    title: 'المسبحة الإلكترونية',
-                    icon: Icons.fingerprint_rounded,
-                    gradient: const [Color(0xFF7C3AED), Color(0xFFA78BFA)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const TasbeehScreen(),
                         ),
                       );
                     },

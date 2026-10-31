@@ -44,16 +44,6 @@ class DatabaseHelper {
         completed INTEGER NOT NULL
       )
     ''');
-    
-    // Tasbeeh Counter history
-    await db.execute('''
-      CREATE TABLE tasbeeh_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        count INTEGER NOT NULL,
-        zikrName TEXT NOT NULL,
-        timestamp TEXT NOT NULL
-      )
-    ''');
   }
 
   Future<void> close() async {
