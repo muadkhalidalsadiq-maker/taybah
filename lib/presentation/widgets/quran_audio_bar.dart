@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../../data/quran_audio.dart';
 import '../../data/quran_player.dart';
+import 'quran_downloads_sheet.dart';
 
 String _fmt(Duration d) {
   final h = d.inHours;
@@ -340,6 +341,20 @@ class _Bar extends StatelessWidget {
               onTap: () {
                 Navigator.pop(ctx);
                 ReciterPickerSheet.show(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.download_for_offline_rounded,
+                  color: TaybahColors.primary),
+              title: Text('الاستماع بدون إنترنت',
+                  style: GoogleFonts.cairo(
+                      fontWeight: FontWeight.bold,
+                      color: TaybahColors.textPrimary)),
+              subtitle: Text('تحميل التلاوات على الجهاز',
+                  style: GoogleFonts.cairo(color: TaybahColors.textMuted)),
+              onTap: () {
+                Navigator.pop(ctx);
+                QuranDownloadsSheet.show(context);
               },
             ),
             Padding(

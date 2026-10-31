@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
+import '../data/quran_downloads.dart';
 import '../data/quran_player.dart';
 import '../data/shared_prefs_helper.dart';
 import 'surah_reader_screen.dart';
 import 'widgets/quran_audio_bar.dart';
+import 'widgets/quran_downloads_sheet.dart';
 import 'widgets/quran_mushaf_view.dart';
 
 class QuranScreen extends StatefulWidget {
@@ -155,6 +157,12 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
           style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
+          if (QuranDownloads.supported)
+            IconButton(
+              tooltip: 'الاستماع بدون إنترنت',
+              icon: const Icon(Icons.download_for_offline_rounded),
+              onPressed: () => QuranDownloadsSheet.show(context),
+            ),
           IconButton(
             tooltip: 'اختيار القارئ',
             icon: const Icon(Icons.record_voice_over_rounded),
@@ -392,19 +400,62 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                               );
                             },
                           ),
-                          Text(
-                            'صـ $page',
-                            style: GoogleFonts.cairo(
-                              fontSize: 12,
-                              color: TaybahColors.gold,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          // تحميل السورة للاستماع بدون إنترنت
+                          AnimatedBuilder(
+                            animation: Listenable.merge([
+                              QuranDownloads.instance,
+                              QuranPlayer.instance,
+                            ]),
+                            builder: (context, _) {
+                              if (!QuranDownloads.supported) {
+                                return const SizedBox.shrink();
+                              }
+                              final dl = QuranDownloads.instance;
+                              final r = QuranPlayer.instance.reciter;
+                              final prog = dl.progressOf(r, id);
+                              if (dl.isDownloaded(r, id)) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  child: Icon(Icons.offline_pin_rounded,
+                                      size: 22, color: TaybahColors.primary),
+                                );
+                              }
+                              if (prog != null) {
+                                return SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(
+                                      value: prog == 0 ? null : prog,
+                                      strokeWidth: 2.4,
+                                      color: TaybahColors.gold,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return IconButton(
+                                tooltip: 'تحميل سورة $name بصوت ${r.name}',
+                                visualDensity: VisualDensity.compact,
+                                icon: Icon(Icons.download_rounded,
+                                    size: 22, color: TaybahColors.textMuted),
+                                onPressed: () => dl.download(r, id),
+                              );
+                            },
                           ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 14,
-                            color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
+                          // قراءة السورة آية بآية
+                          IconButton(
+                            tooltip: 'قراءة السورة آية بآية',
+                            visualDensity: VisualDensity.compact,
+                            icon: Icon(Icons.format_list_numbered_rtl_rounded,
+                                size: 22, color: TaybahColors.textMuted),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SurahReaderScreen(surahMeta: surah),
+                              ),
+                            ),
                           ),
                         ],
                       ),

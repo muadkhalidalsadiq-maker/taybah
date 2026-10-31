@@ -5,6 +5,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'asset_loader.dart';
 import 'quran_audio.dart';
+import 'quran_downloads.dart';
 
 /// مشغل الصوت الوحيد في التطبيق (just_audio_background يدعم مشغلاً واحداً فقط).
 /// يُستعمل لتلاوة القرآن ولمعاينة أصوات الأذان.
@@ -115,6 +116,7 @@ class QuranPlayer extends ChangeNotifier {
     _reciter = await QuranAudio.getSelectedReciter();
     await _ensureMeta();
     notifyListeners();
+    QuranDownloads.instance.scan(_reciter);
   }
 
   /// يتخلى عن المشغل لصالح استعمال آخر (مثل معاينة الأذان).
@@ -125,11 +127,20 @@ class QuranPlayer extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<AudioSource> _buildPlaylist(QuranReciter r) {
+  /// قائمة السور: الملف المحمّل على الجهاز إن وُجد، وإلا البث من الإنترنت.
+  Future<List<AudioSource>> _buildPlaylist(QuranReciter r) async {
+    final dl = QuranDownloads.instance;
+    await dl.scan(r);
+    final local = <int, String>{};
+    for (var id = 1; id <= 114; id++) {
+      final path = await dl.localPath(r, id);
+      if (path != null) local[id] = path;
+    }
     return List.generate(114, (i) {
       final id = i + 1;
+      final path = local[id];
       return AudioSource.uri(
-        Uri.parse(r.urlForSurah(id)),
+        path != null ? Uri.file(path) : Uri.parse(r.urlForSurah(id)),
         tag: MediaItem(
           id: '${r.id}_$id',
           title: 'سورة ${surahName(id)}',
@@ -167,7 +178,7 @@ class QuranPlayer extends ChangeNotifier {
       try {
         await _player.stop();
         await _player.setAudioSources(
-          _buildPlaylist(_reciter),
+          await _buildPlaylist(_reciter),
           initialIndex: surahId - 1,
           initialPosition: from ?? Duration.zero,
         ).timeout(const Duration(seconds: 45));
@@ -250,6 +261,7 @@ class QuranPlayer extends ChangeNotifier {
     _reciter = r;
     await QuranAudio.setSelectedReciter(r.id);
     notifyListeners();
+    QuranDownloads.instance.scan(r);
     if (id != null && _ownsPlayer) await playSurah(id, reciter: r);
   }
 

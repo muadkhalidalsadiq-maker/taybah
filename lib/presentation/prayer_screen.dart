@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_compass/flutter_compass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
@@ -9,6 +7,7 @@ import '../data/adhan_voices.dart';
 import '../data/notification_service.dart';
 import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
+import 'qibla_screen.dart';
 import 'widgets/adhan_voice_picker.dart';
 import 'widgets/city_picker_sheet.dart';
 
@@ -29,10 +28,6 @@ class _PrayerScreenState extends State<PrayerScreen>
   bool _isLoading = true;
   Timer? _countdownTimer;
 
-  // Qibla & Compass heading
-  double _qiblaAngle = 104.0; // Typical Libya Qibla angle
-  StreamSubscription<CompassEvent>? _compassSub;
-  double? _deviceHeading;
 
   // Prayer notification toggles
   final Map<String, bool> _prayerAlerts = {
@@ -47,14 +42,10 @@ class _PrayerScreenState extends State<PrayerScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _loadSavedCityAndTimes();
     _loadNawafil();
     _loadPrayerAlerts();
-
-    _compassSub = FlutterCompass.events?.listen((event) {
-      if (mounted) setState(() => _deviceHeading = event.heading);
-    });
 
     // Refresh countdown every second
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -165,7 +156,6 @@ class _PrayerScreenState extends State<PrayerScreen>
 
   @override
   void dispose() {
-    _compassSub?.cancel();
     _countdownTimer?.cancel();
     _tabController.dispose();
     super.dispose();
@@ -235,17 +225,6 @@ class _PrayerScreenState extends State<PrayerScreen>
       ),
     );
     final nearest = await PrayerApi.autoDetectAndSetNearestCity();
-    final position = await PrayerApi.getCurrentPosition();
-
-    if (position != null) {
-      final angle = PrayerApi.calculateQiblaAngle(
-        position.latitude,
-        position.longitude,
-      );
-      if (mounted) {
-        setState(() => _qiblaAngle = angle);
-      }
-    }
 
     if (nearest != null) {
       await _loadSavedCityAndTimes();
@@ -295,11 +274,18 @@ class _PrayerScreenState extends State<PrayerScreen>
           ),
           tabs: const [
             Tab(text: 'المواقيت'),
-            Tab(text: 'القبلة'),
             Tab(text: 'النوافل والسنن'),
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.explore_rounded),
+            tooltip: 'اتجاه القبلة',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const QiblaScreen()),
+            ),
+          ),
           IconButton(
             icon: Icon(
               _isSummer ? Icons.wb_sunny_rounded : Icons.ac_unit_rounded,
@@ -324,7 +310,6 @@ class _PrayerScreenState extends State<PrayerScreen>
         controller: _tabController,
         children: [
           _buildPrayerTimesTab(),
-          _buildQiblaTab(),
           _buildNawafilTab(),
         ],
       ),
@@ -810,148 +795,6 @@ class _PrayerScreenState extends State<PrayerScreen>
             );
           }),
       ],
-    );
-  }
-
-  Widget _buildQiblaTab() {
-    final heading = _deviceHeading ?? 0.0;
-    final relQibla = ((_qiblaAngle - heading) % 360 + 360) % 360;
-    final diff = (relQibla > 180 ? 360 - relQibla : relQibla).abs();
-    final isAligned = diff < 4.0;
-
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 110),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Compass Container
-            Container(
-              width: 240,
-              height: 240,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: TaybahColors.surface,
-                border: Border.all(
-                  color: isAligned ? Colors.green : TaybahColors.border,
-                  width: isAligned ? 3 : 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: (isAligned ? Colors.green : Colors.black).withAlpha(isAligned ? 60 : 15),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Compass Ring
-                  Transform.rotate(
-                    angle: relQibla * (math.pi / 180.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: isAligned ? Colors.green : TaybahColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.navigation_rounded,
-                            color: Colors.white,
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(height: 60),
-                        Container(
-                          width: 4,
-                          height: 40,
-                          color: (isAligned ? Colors.green : TaybahColors.primary).withAlpha(100),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Central Kaaba Icon
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: isAligned ? Colors.green.withAlpha(30) : TaybahColors.primaryTint,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isAligned ? Colors.green : TaybahColors.primary,
-                        width: 2,
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.mosque_rounded,
-                        color: isAligned ? Colors.green : TaybahColors.primary,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            Text(
-              'اتجاه القبلة',
-              style: GoogleFonts.cairo(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: TaybahColors.textPrimary,
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: TaybahColors.primaryLight,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'الزاوية: ${_qiblaAngle.toStringAsFixed(1)}° بالنسبة للشمال',
-                style: GoogleFonts.cairo(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: TaybahColors.primaryDark,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                'اتجاه الكعبة المشرفة بالنسبة لمدينة $_cityName. ضع هاتفك بشكل أفقي لتحديد الاتجاه بدقة.',
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  color: TaybahColors.textMuted,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton.icon(
-              onPressed: _detectLocation,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('إعادة ضبط بالـ GPS'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

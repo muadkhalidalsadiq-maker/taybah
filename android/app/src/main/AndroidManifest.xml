@@ -11,6 +11,8 @@
     <!-- منبهات دقيقة حتى يصل الأذان في وقته بالدقيقة -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- طلب استثناء التطبيق من توفير البطارية حتى لا يتأخر الأذان -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- تشغيل التلاوة في الخلفية وعلى شاشة القفل -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -54,6 +56,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
+        </receiver>
+        <!-- ودجت «الصلاة القادمة» على الشاشة الرئيسية -->
+        <receiver android:name=".PrayerWidgetProvider" android:exported="false"
+            android:label="الصلاة القادمة • طيبة">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_info" />
         </receiver>
         <!-- مستقبلات التنبيهات المجدولة (flutter_local_notifications):
              تعيد جدولة الأذان بعد إعادة تشغيل الهاتف أو تحديث التطبيق -->

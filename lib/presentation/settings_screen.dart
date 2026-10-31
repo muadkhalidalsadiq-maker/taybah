@@ -9,8 +9,10 @@ import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
 import '../main.dart';
 import 'asma_allah_screen.dart';
+import 'privacy_screen.dart';
 import 'qibla_screen.dart';
 import 'ruqyah_screen.dart';
+import 'widgets/adhan_reliability_card.dart';
 import 'widgets/adhan_voice_picker.dart';
 import 'widgets/city_picker_sheet.dart';
 
@@ -701,6 +703,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 22),
 
+          // Adhan reliability
+          _buildSectionHeader('موثوقية الأذان والتنبيهات', Icons.verified_user_rounded),
+          const AdhanReliabilityCard(),
+
+          const SizedBox(height: 22),
+
           // Adhan & Notifications Section
           _buildSectionHeader('الأذان والتنبيهات الإيمانية', Icons.notifications_active_rounded),
           Container(
@@ -886,7 +894,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار الصباح (عند الإشراق)',
+                    'تذكير أذكار الصباح (بعد الفجر بنصف ساعة)',
                     style: GoogleFonts.cairo(fontSize: 13),
                   ),
                   value: _isMorningReminder,
@@ -903,7 +911,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار المساء (بعد العصر)',
+                    'تذكير أذكار المساء (بعد العصر بثلث ساعة)',
                     style: GoogleFonts.cairo(fontSize: 13),
                   ),
                   value: _isEveningReminder,
@@ -920,7 +928,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار النوم وسورة الملك',
+                    'تذكير أذكار النوم (بعد العشاء بساعتين)',
                     style: GoogleFonts.cairo(fontSize: 13),
                   ),
                   value: _isSleepReminder,
@@ -1149,7 +1157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'تطبيق طيبة الإسلامي (V3)',
+                            'طيبة للأذكار والصلاة • الإصدار 2.10',
                             style: GoogleFonts.cairo(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -1181,6 +1189,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textAlign: TextAlign.center,
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Material(
+            color: TaybahColors.surface,
+            borderRadius: BorderRadius.circular(18),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(color: TaybahColors.border),
+              ),
+              leading: Icon(Icons.privacy_tip_rounded, color: TaybahColors.primary),
+              title: Text('سياسة الخصوصية',
+                  style: GoogleFonts.cairo(
+                      fontWeight: FontWeight.bold,
+                      color: TaybahColors.textPrimary)),
+              trailing: Icon(Icons.chevron_left_rounded,
+                  color: TaybahColors.textMuted),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+              ),
             ),
           ),
         ],

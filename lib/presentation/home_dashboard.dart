@@ -377,6 +377,47 @@ class _HomeTabState extends State<HomeTab> {
     // طلب إذن الإشعارات (أندرويد 13+ و iOS) حتى يصل الأذان فعلاً
     await NotificationService.instance.requestPermissions(askExactAlarm: isFirst);
     NotificationService.instance.rescheduleAll();
+    if (isFirst) await _askBatteryExemption();
+  }
+
+  /// شرح بسيط ثم طلب استثناء التطبيق من توفير البطارية (أندرويد) حتى لا يتأخر الأذان.
+  Future<void> _askBatteryExemption() async {
+    final svc = NotificationService.instance;
+    if (await svc.batteryUnrestricted() || !mounted) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: TaybahColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        icon: const Icon(Icons.battery_alert_rounded,
+            color: TaybahColors.gold, size: 36),
+        title: Text(
+          'حتى يصلك الأذان في وقته',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.cairo(
+              fontWeight: FontWeight.bold, color: TaybahColors.textPrimary),
+        ),
+        content: Text(
+          'بعض الهواتف توقف التنبيهات لتوفير البطارية فيتأخر الأذان أو لا يصل. '
+          'اسمح لتطبيق طيبة بالعمل بدون قيود البطارية.',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.cairo(
+              fontSize: 13.5, color: TaybahColors.textSecondary, height: 1.6),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('لاحقاً',
+                style: GoogleFonts.cairo(color: TaybahColors.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('سماح'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) await svc.requestBatteryUnrestricted();
   }
 
   int? _loadedDay;
