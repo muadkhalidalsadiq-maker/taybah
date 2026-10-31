@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+/// الخطوط: Somar Sans للواجهة، وأميري للنص القرآني.
+class TaybahFonts {
+  TaybahFonts._();
+  static const String ui = 'Somar';
+}
 
 class TaybahColors {
   /// يحدده AppState عند تغيير الوضع الليلي؛ الألوان المحايدة بالأسفل تتبدل تلقائياً.
@@ -26,9 +31,15 @@ class TaybahColors {
   static Color get goldSoft =>
       isDark ? const Color(0xFF2B2513) : const Color(0xFFFAF3DF);
 
+  /// خلفية الشاشات. في الوضع الليلي شفافة لتظهر صورة المسجد النبوي خلفها.
   static Color get background =>
-      isDark ? darkBg : const Color(0xFFF7FAF8);
-  static Color get surface => isDark ? darkSurface : Colors.white;
+      isDark ? Colors.transparent : const Color(0xFFF7FAF8);
+
+  /// البطاقات: في الليلي شبه معتمة فتطفو فوق الصورة.
+  static Color get surface => isDark ? const Color(0xE0101E17) : Colors.white;
+
+  /// النوافذ المنبثقة والقوائم السفلية (معتمة دائماً).
+  static Color get sheet => isDark ? const Color(0xFF0F1C15) : Colors.white;
   static Color get surfaceMuted =>
       isDark ? darkSurfaceMuted : const Color(0xFFEFF4F0);
   static Color get border => isDark ? darkBorder : const Color(0xFFDFE8E1);
@@ -54,12 +65,13 @@ class TaybahColors {
 
 class TaybahTheme {
   static ThemeData get lightTheme {
-    final baseTextTheme = GoogleFonts.cairoTextTheme();
+    final baseTextTheme = ThemeData.light().textTheme.apply(fontFamily: TaybahFonts.ui);
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: TaybahColors.background,
+      scaffoldBackgroundColor: const Color(0xFFF7FAF8),
+      fontFamily: TaybahFonts.ui,
       primaryColor: TaybahColors.primary,
       colorScheme: ColorScheme.light(
         primary: TaybahColors.primary,
@@ -76,37 +88,37 @@ class TaybahTheme {
         onError: Colors.white,
       ),
       textTheme: baseTextTheme.copyWith(
-        displayLarge: GoogleFonts.cairo(
+        displayLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 32,
           fontWeight: FontWeight.w600,
           color: TaybahColors.textPrimary,
         ),
-        displayMedium: GoogleFonts.cairo(
+        displayMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 26,
           fontWeight: FontWeight.w600,
           color: TaybahColors.textPrimary,
         ),
-        titleLarge: GoogleFonts.cairo(
+        titleLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: TaybahColors.textPrimary,
         ),
-        titleMedium: GoogleFonts.cairo(
+        titleMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: TaybahColors.textPrimary,
         ),
-        bodyLarge: GoogleFonts.cairo(
+        bodyLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 15,
           fontWeight: FontWeight.w300,
           color: TaybahColors.textPrimary,
         ),
-        bodyMedium: GoogleFonts.cairo(
+        bodyMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 13,
           fontWeight: FontWeight.w300,
           color: TaybahColors.textSecondary,
         ),
-        labelLarge: GoogleFonts.cairo(
+        labelLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -118,7 +130,7 @@ class TaybahTheme {
         scrolledUnderElevation: 1.5,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 19,
           fontWeight: FontWeight.w600,
           color: TaybahColors.textPrimary,
@@ -144,7 +156,7 @@ class TaybahTheme {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final isSelected = states.contains(WidgetState.selected);
-          return GoogleFonts.cairo(
+          return TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             color: isSelected ? TaybahColors.primaryDark : TaybahColors.textMuted,
@@ -168,7 +180,7 @@ class TaybahTheme {
             borderRadius: BorderRadius.circular(18),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: GoogleFonts.cairo(
+          textStyle: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -190,7 +202,7 @@ class TaybahTheme {
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: TaybahColors.primary, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
+        hintStyle: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 14,
           color: TaybahColors.textMuted,
         ),
@@ -200,12 +212,13 @@ class TaybahTheme {
 
   // ──── Dark Theme (Emerald Night Mode) ────
   static ThemeData get darkTheme {
-    final baseTextTheme = GoogleFonts.cairoTextTheme(ThemeData.dark().textTheme);
+    final baseTextTheme = ThemeData.dark().textTheme.apply(fontFamily: TaybahFonts.ui);
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: TaybahColors.darkBg,
+      scaffoldBackgroundColor: Colors.transparent,
+      fontFamily: TaybahFonts.ui,
       cardColor: TaybahColors.darkSurface,
       dialogTheme: const DialogThemeData(backgroundColor: TaybahColors.darkSurface),
       canvasColor: TaybahColors.darkBg,
@@ -230,49 +243,49 @@ class TaybahTheme {
         onError: Colors.white,
       ),
       textTheme: baseTextTheme.copyWith(
-        displayLarge: GoogleFonts.cairo(
+        displayLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 32,
           fontWeight: FontWeight.w600,
           color: TaybahColors.darkTextPrimary,
         ),
-        displayMedium: GoogleFonts.cairo(
+        displayMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 26,
           fontWeight: FontWeight.w600,
           color: TaybahColors.darkTextPrimary,
         ),
-        titleLarge: GoogleFonts.cairo(
+        titleLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: TaybahColors.darkTextPrimary,
         ),
-        titleMedium: GoogleFonts.cairo(
+        titleMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: TaybahColors.darkTextPrimary,
         ),
-        bodyLarge: GoogleFonts.cairo(
+        bodyLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 15,
           fontWeight: FontWeight.w300,
           color: TaybahColors.darkTextPrimary,
         ),
-        bodyMedium: GoogleFonts.cairo(
+        bodyMedium: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 13,
           fontWeight: FontWeight.w300,
           color: TaybahColors.darkTextSecondary,
         ),
-        labelLarge: GoogleFonts.cairo(
+        labelLarge: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: TaybahColors.darkSurface,
+        backgroundColor: const Color(0xB3070F0B),
         foregroundColor: TaybahColors.darkTextPrimary,
         elevation: 0,
         scrolledUnderElevation: 1.5,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.cairo(
+        titleTextStyle: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 19,
           fontWeight: FontWeight.w600,
           color: TaybahColors.darkTextPrimary,
@@ -300,7 +313,7 @@ class TaybahTheme {
             borderRadius: BorderRadius.circular(18),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: GoogleFonts.cairo(
+          textStyle: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -322,7 +335,7 @@ class TaybahTheme {
           borderRadius: BorderRadius.circular(18),
           borderSide: const BorderSide(color: TaybahColors.primaryAccent, width: 1.5),
         ),
-        hintStyle: GoogleFonts.cairo(
+        hintStyle: TextStyle(fontFamily: TaybahFonts.ui, 
           fontSize: 14,
           color: TaybahColors.darkTextMuted,
         ),

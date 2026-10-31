@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../../data/quran_downloads.dart';
 import '../../data/quran_player.dart';
@@ -50,7 +49,7 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
         final busy = _dl.isBusy;
         return Container(
           decoration: BoxDecoration(
-            color: TaybahColors.surface,
+            color: TaybahColors.sheet,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: EdgeInsets.fromLTRB(
@@ -80,12 +79,12 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('الاستماع بدون إنترنت',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
                                 color: TaybahColors.textPrimary)),
                         Text('حمّل التلاوات مرة واحدة واستمع في أي وقت',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 11.5,
                                 color: TaybahColors.textMuted)),
                       ],
@@ -103,15 +102,15 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
                   leading: Icon(Icons.record_voice_over_rounded,
                       color: TaybahColors.primary),
                   title: Text(r.name,
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontWeight: FontWeight.bold,
                           color: TaybahColors.textPrimary)),
                   subtitle: Text(
                       '$count من 114 سورة محمّلة • ${_size.toStringAsFixed(0)} ميجابايت',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12, color: TaybahColors.textMuted)),
                   trailing: Text('تغيير',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                           color: TaybahColors.gold,
                           fontWeight: FontWeight.bold)),
                   onTap: () async {
@@ -134,7 +133,7 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
                 const SizedBox(height: 8),
                 Text(
                   'جارٍ التحميل… (${_dl.queueLength + 1} سورة متبقية)',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 12, color: TaybahColors.textSecondary),
                 ),
               ],
@@ -147,7 +146,7 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
                   },
                   icon: const Icon(Icons.stop_circle_outlined),
                   label: Text('إيقاف التحميل',
-                      style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold)),
                 )
               else if (count < 114)
                 ElevatedButton.icon(
@@ -165,13 +164,13 @@ class _QuranDownloadsSheetState extends State<QuranDownloadsSheet> {
                   icon: const Icon(Icons.delete_outline_rounded,
                       color: Colors.redAccent),
                   label: Text('حذف تلاوات هذا القارئ من الجهاز',
-                      style: GoogleFonts.cairo(color: Colors.redAccent)),
+                      style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.redAccent)),
                 ),
               ],
               const SizedBox(height: 6),
               Text(
                 'المصحف كاملاً يأخذ عادة بين 300 و900 ميجابايت حسب القارئ. يمكنك أيضاً تحميل سورة واحدة من زر التحميل بجانبها.',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 11, color: TaybahColors.textMuted, height: 1.6),
               ),
             ],

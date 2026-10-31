@@ -153,8 +153,8 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'القرآن الكريم (رواية قالون)',
-          style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
+          'القرآن الكريم',
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
           if (QuranDownloads.supported)
@@ -175,8 +175,8 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
           indicatorWeight: 3,
           labelColor: isDark ? TaybahColors.goldLight : TaybahColors.primary,
           unselectedLabelColor: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
-          labelStyle: GoogleFonts.cairo(fontSize: 14, fontWeight: FontWeight.bold),
-          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 14),
+          labelStyle: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 14, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 14),
           labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: const [
             Tab(text: 'المصحف'),
@@ -285,7 +285,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         children: [
                           Text(
                             'متابعة القراءة في المصحف',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 12,
                               color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
                               fontWeight: FontWeight.bold,
@@ -313,7 +313,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         Expanded(
           child: _filteredSurahs.isEmpty
               ? Center(
-                  child: Text('لا توجد سورة مطابقة', style: GoogleFonts.cairo(color: Colors.grey)),
+                  child: Text('لا توجد سورة مطابقة', style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.grey)),
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -353,7 +353,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         child: Center(
                           child: Text(
                             '$id',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -371,7 +371,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                       ),
                       subtitle: Text(
                         '$typeAr • $versesCount آية • صـ $page',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                         ),
@@ -496,7 +496,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
               child: Center(
                 child: Text(
                   '$jozzNumber',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontWeight: FontWeight.bold,
                     color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
                   ),
@@ -505,7 +505,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
             ),
             title: Text(
               'الجزء $jozzNumber',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -513,7 +513,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
             ),
             subtitle: Text(
               surahsInJozz.isNotEmpty ? 'يبدأ بـ: سورة $firstSurahName • صـ $startPage' : '',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 12,
                 color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
               ),
@@ -566,7 +566,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         : _verseSearchController.text.isNotEmpty
                             ? 'لا توجد آيات مطابقة للبحث'
                             : 'اكتب كلمتين على الأقل للبحث في نص الآيات',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 12,
                   color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                 ),
@@ -617,7 +617,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                             ),
                             child: Text(
                               'سورة $sName • آية $vId • صـ $p',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -628,7 +628,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                             children: [
                               Text(
                                 'انتقال لصفحة $p',
-                                style: GoogleFonts.cairo(fontSize: 11, color: TaybahColors.gold),
+                                style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 11, color: TaybahColors.gold),
                               ),
                               const SizedBox(width: 4),
                               const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: TaybahColors.gold),

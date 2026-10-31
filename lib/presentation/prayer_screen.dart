@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
 import '../data/adhan_voices.dart';
@@ -81,8 +80,8 @@ class _PrayerScreenState extends State<PrayerScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          next ? 'تم تفعيل تنبيه $prayerName ✓' : 'تم إيقاف تنبيه $prayerName',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          next ? 'تم تفعيل تنبيه $prayerName' : 'تم إيقاف تنبيه $prayerName',
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold),
         ),
         backgroundColor: next ? TaybahColors.primary : TaybahColors.textSecondary,
         duration: const Duration(seconds: 2),
@@ -106,7 +105,7 @@ class _PrayerScreenState extends State<PrayerScreen>
             Text(
               'تنبيه الأذان يعمل بنجاح!',
               style:
-                  GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
+                  TextStyle(fontFamily: TaybahFonts.ui, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -116,14 +115,14 @@ class _PrayerScreenState extends State<PrayerScreen>
           children: [
             Text(
               'تم إرسال إشعار تجريبي لأذان $prayerName بالصوت المختار.',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
               'ستصلك تنبيهات الأذان في موعد كل صلاة بدقة بحسب توقيت مدينتك، مع الصوت والاهتزاز.',
               style:
-                  GoogleFonts.cairo(fontSize: 12, color: TaybahColors.textMuted),
+                  TextStyle(fontFamily: TaybahFonts.ui, fontSize: 12, color: TaybahColors.textMuted),
             ),
           ],
         ),
@@ -134,7 +133,7 @@ class _PrayerScreenState extends State<PrayerScreen>
             },
             child: Text(
               'إيقاف الأذان',
-              style: GoogleFonts.cairo(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.redAccent, fontWeight: FontWeight.bold),
             ),
           ),
           ElevatedButton(
@@ -233,7 +232,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         SnackBar(
           content: Text(
             'تم تحديد أقرب مدينة بالـ GPS: $_cityName، وتحديث المواقيت.',
-            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold),
           ),
           backgroundColor: TaybahColors.primary,
         ),
@@ -255,7 +254,7 @@ class _PrayerScreenState extends State<PrayerScreen>
       appBar: AppBar(
         title: Text(
           'مواقيت الصلاة',
-          style: GoogleFonts.cairo(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         bottom: TabBar(
           controller: _tabController,
@@ -264,11 +263,11 @@ class _PrayerScreenState extends State<PrayerScreen>
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: TaybahColors.primary,
           unselectedLabelColor: TaybahColors.textMuted,
-          labelStyle: GoogleFonts.cairo(
+          labelStyle: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
-          unselectedLabelStyle: GoogleFonts.cairo(
+          unselectedLabelStyle: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 14,
             fontWeight: FontWeight.normal,
           ),
@@ -361,15 +360,15 @@ class _PrayerScreenState extends State<PrayerScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'المدينة المحددة (مواقيت الأوائل)',
-                        style: GoogleFonts.cairo(
+                        'المدينة',
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 11,
                           color: TaybahColors.textMuted,
                         ),
                       ),
                       Text(
                         'ليبيا - $_cityName',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: TaybahColors.textPrimary,
@@ -389,7 +388,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   ),
                   child: Text(
                     'تغيير',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.primaryDark,
@@ -435,7 +434,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                         (nextPrayer['isBetweenAdhanAndIqama'] == true)
                             ? 'حان الآن وقت أذان'
                             : 'الصلاة القادمة',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 13,
                           color: Colors.white70,
                         ),
@@ -443,7 +442,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                       const SizedBox(height: 2),
                       Text(
                         nextPrayer['name'] ?? '',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -465,7 +464,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                         ),
                         child: Text(
                           nextPrayer['time12'] ?? nextPrayer['time'] ?? '',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -475,7 +474,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                       const SizedBox(height: 4),
                       Text(
                         'الإقامة: ${nextPrayer['iqamaTime12'] ?? ''}',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 11.5,
                           color: TaybahColors.goldLight,
                           fontWeight: FontWeight.bold,
@@ -498,9 +497,9 @@ class _PrayerScreenState extends State<PrayerScreen>
                   children: [
                     Text(
                       (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                          ? '⏳ متبقي على إقامة الصلاة'
-                          : '⏳ متبقي على الأذان',
-                      style: GoogleFonts.cairo(
+                          ? 'متبقي على إقامة الصلاة'
+                          : 'متبقي على الأذان',
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         color: Colors.white70,
                         fontWeight: FontWeight.w600,
@@ -510,7 +509,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                       (nextPrayer['isBetweenAdhanAndIqama'] == true)
                           ? (nextPrayer['iqamaRemaining'] ?? '00:00')
                           : (nextPrayer['remaining'] ?? '00:00:00'),
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         color: TaybahColors.goldLight,
@@ -574,7 +573,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   children: [
                     Text(
                       'صوت الأذان',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 11,
                         color: TaybahColors.textMuted,
                       ),
@@ -594,7 +593,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                                 snap.data?.name ?? '...',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.bold,
                                   color: TaybahColors.textPrimary,
@@ -604,7 +603,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                             const SizedBox(width: 4),
                             Text(
                               'تغيير',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.bold,
                                 color: TaybahColors.gold,
@@ -630,7 +629,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                     horizontal: 12,
                     vertical: 8,
                   ),
-                  textStyle: GoogleFonts.cairo(
+                  textStyle: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 11.5,
                     fontWeight: FontWeight.bold,
                   ),
@@ -648,7 +647,7 @@ class _PrayerScreenState extends State<PrayerScreen>
 
         Text(
           'جدول الصلوات والإقامة اليوم',
-          style: GoogleFonts.cairo(
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: TaybahColors.textPrimary,
@@ -715,7 +714,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                           children: [
                             Text(
                               p['name'] as String,
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 16,
                                 fontWeight: isNext ? FontWeight.bold : FontWeight.w600,
                                 color: isNext
@@ -736,7 +735,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                                 ),
                                 child: Text(
                                   'القادمة',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -749,7 +748,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                         if (iqamaTime12.isNotEmpty)
                           Text(
                             'الإقامة: $iqamaTime12',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 11.5,
                               color: TaybahColors.gold,
                               fontWeight: FontWeight.bold,
@@ -760,7 +759,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   ),
                   Text(
                     adhanTime12,
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: isNext
@@ -824,7 +823,7 @@ class _PrayerScreenState extends State<PrayerScreen>
               backgroundColor: TaybahColors.primaryTint,
               child: Text(
                 '${i + 1}',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontWeight: FontWeight.bold,
                   color: TaybahColors.primary,
                 ),
@@ -832,7 +831,7 @@ class _PrayerScreenState extends State<PrayerScreen>
             ),
             title: Text(
               n['name'] ?? '',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: TaybahColors.textPrimary,
@@ -840,7 +839,7 @@ class _PrayerScreenState extends State<PrayerScreen>
             ),
             subtitle: Text(
               n['ruling'] ?? '',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 12,
                 color: TaybahColors.gold,
                 fontWeight: FontWeight.w600,
@@ -854,7 +853,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   children: [
                     Text(
                       n['description'] ?? '',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 14,
                         color: TaybahColors.textSecondary,
                         height: 1.6,
@@ -879,7 +878,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                           Expanded(
                             child: Text(
                               n['reward'] ?? '',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 13,
                                 color: TaybahColors.primaryDark,
                                 height: 1.5,

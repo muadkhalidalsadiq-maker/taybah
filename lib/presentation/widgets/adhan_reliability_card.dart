@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../../data/alert_settings.dart';
 import '../../data/notification_service.dart';
@@ -78,13 +77,13 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.textPrimary)),
                 if (!ok)
                   Text(hint,
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 11, color: TaybahColors.textMuted)),
               ],
             ),
@@ -98,7 +97,7 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
                     borderRadius: BorderRadius.circular(12)),
               ),
               child: Text('إصلاح',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.gold)),
@@ -135,9 +134,9 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
               Expanded(
                 child: Text(
                   allOk
-                      ? 'الأذان جاهز ويصل في وقته ✓'
+                      ? 'الأذان جاهز ويصل في وقته'
                       : 'يوجد ما قد يمنع وصول الأذان في وقته',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 13.5,
                     fontWeight: FontWeight.bold,
                     color: TaybahColors.textPrimary,
@@ -185,7 +184,7 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
               const SizedBox(width: 8),
               Expanded(
                 child: Text('تنبيه قبل الأذان',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.textPrimary)),
@@ -200,7 +199,7 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
               for (final m in AlertSettings.preAdhanOptions)
                 ChoiceChip(
                   label: Text(m == 0 ? 'بدون' : '$m د',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: _pre == m
@@ -225,12 +224,12 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
             dense: true,
             secondary: Icon(Icons.groups_rounded, color: TaybahColors.primary),
             title: Text('تنبيه وقت الإقامة',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: TaybahColors.textPrimary)),
             subtitle: Text('الفجر +20 د، المغرب +10 د، والباقي +15 د',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 11, color: TaybahColors.textMuted)),
             value: _iqama,
             activeTrackColor: TaybahColors.primary,
@@ -247,12 +246,12 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
               secondary:
                   Icon(Icons.volume_off_rounded, color: TaybahColors.primary),
               title: Text('الأذان حتى في الوضع الصامت',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.textPrimary)),
               subtitle: Text('يُشغَّل بصوت المنبه بدل صوت الإشعارات',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 11, color: TaybahColors.textMuted)),
               value: _silent,
               activeTrackColor: TaybahColors.primary,

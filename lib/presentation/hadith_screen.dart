@@ -38,7 +38,7 @@ class _HadithScreenState extends State<HadithScreen> {
       appBar: AppBar(
         title: Text(
           'الأحاديث النبوية الشريفة',
-          style: GoogleFonts.cairo(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
           Padding(
@@ -52,7 +52,7 @@ class _HadithScreenState extends State<HadithScreen> {
                 ),
                 child: Text(
                   '${_hadithList.length} حديث',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: TaybahColors.primary,
@@ -102,7 +102,7 @@ class _HadithScreenState extends State<HadithScreen> {
                                 child: Center(
                                   child: Text(
                                     '$id',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
                                       color: TaybahColors.primaryDark,
@@ -113,7 +113,7 @@ class _HadithScreenState extends State<HadithScreen> {
                               const SizedBox(width: 10),
                               Text(
                                 'صحيح البخاري',
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 13,
                                   color: TaybahColors.gold,
                                   fontWeight: FontWeight.bold,
@@ -160,7 +160,7 @@ class _HadithScreenState extends State<HadithScreen> {
                         ),
                         child: Text(
                           'رواه: $narrator',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 12,
                             color: TaybahColors.textSecondary,
                             fontWeight: FontWeight.w500,

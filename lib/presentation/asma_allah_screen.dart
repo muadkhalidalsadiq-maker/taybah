@@ -58,7 +58,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: TaybahColors.surface,
+          color: TaybahColors.sheet,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: const [
             BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, -4)),
@@ -86,7 +86,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
               ),
               child: Text(
                 'الاسم رقم ${item['id']} من 99',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: TaybahColors.primaryDark,
@@ -112,7 +112,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
               alignment: Alignment.centerRight,
               child: Text(
                 'المعنى والدلالة:',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: isDark ? TaybahColors.goldLight : TaybahColors.primary,
@@ -129,7 +129,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
               ),
               child: Text(
                 item['meaning'] ?? '',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 16,
                   height: 1.8,
                   color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -154,7 +154,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                         SnackBar(
                           content: Text(
                             'تم نسخ اسم ${item['name']} وشرحه بنجاح',
-                            style: GoogleFonts.cairo(),
+                            style: const TextStyle(fontFamily: TaybahFonts.ui),
                           ),
                           behavior: SnackBarBehavior.floating,
                           backgroundColor: TaybahColors.primary,
@@ -162,7 +162,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                       );
                     },
                     icon: const Icon(Icons.copy_rounded, size: 18),
-                    label: Text('نسخ الاسم والمعنى', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                    label: Text('نسخ الاسم والمعنى', style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -232,7 +232,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                           children: [
                             Text(
                               '«مَنْ أَحْصَاهَا دَخَلَ الجَنَّةَ»',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: TaybahColors.goldLight,
@@ -241,7 +241,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                             const SizedBox(height: 2),
                             Text(
                               '99 اسماً مباركاً مع المعاني والشروحات الجليلة',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 12,
                                 color: Colors.white70,
                               ),
@@ -277,7 +277,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
                       ? Center(
                           child: Text(
                             'لم يتم العثور على نتائج للبحث',
-                            style: GoogleFonts.cairo(color: Colors.grey),
+                            style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.grey),
                           ),
                         )
                       : _isGrid
@@ -340,7 +340,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
               ),
               child: Text(
                 '${item['id']}',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   color: TaybahColors.gold,
@@ -380,7 +380,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
           ),
           child: Text(
             '${item['id']}',
-            style: GoogleFonts.cairo(
+            style: TextStyle(fontFamily: TaybahFonts.ui, 
               fontSize: 13,
               fontWeight: FontWeight.bold,
               color: TaybahColors.gold,
@@ -399,7 +399,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
           item['meaning'] ?? '',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.cairo(
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 12,
             color: isDark ? TaybahColors.darkTextSecondary : TaybahColors.textSecondary,
           ),

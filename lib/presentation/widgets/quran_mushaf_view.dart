@@ -108,7 +108,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
       builder: (ctx) => AlertDialog(
         title: Text(
           'انتقال إلى صفحة في المصحف',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold, fontSize: 16),
           textAlign: TextAlign.center,
         ),
         content: Column(
@@ -116,7 +116,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
           children: [
             Text(
               'أدخل رقم الصفحة (من 1 إلى 604):',
-              style: GoogleFonts.cairo(fontSize: 13, color: TaybahColors.textMuted),
+              style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 13, color: TaybahColors.textMuted),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -124,7 +124,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               autofocus: true,
-              style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 18, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                 focusedBorder: OutlineInputBorder(
@@ -138,7 +138,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.grey)),
+            child: Text('إلغاء', style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: TaybahColors.primary),
@@ -149,7 +149,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
                 jumpToPage(p);
               }
             },
-            child: Text('انتقال', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text('انتقال', style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -270,7 +270,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
               const SizedBox(width: 8),
               Text(
                 'الجُزْءُ $jozzNum',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -297,7 +297,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
               ),
               child: Text(
                 'صفحة $_currentPage',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -313,7 +313,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
   Widget _buildMushafSinglePage(int pageNum, List<Map<String, dynamic>> verses, bool isDark) {
     if (verses.isEmpty) {
       return Center(
-        child: Text('جاري تحميل الصفحة $pageNum...', style: GoogleFonts.cairo()),
+        child: Text('جاري تحميل الصفحة $pageNum...', style: const TextStyle(fontFamily: TaybahFonts.ui)),
       );
     }
 
@@ -412,7 +412,7 @@ class QuranMushafViewState extends State<QuranMushafView> {
                 ),
                 Text(
                   'رواية قالون عن نافع • $typeAr',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 11,
                     color: TaybahColors.gold,
                   ),

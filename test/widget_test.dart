@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:taybah/core/theme.dart';
@@ -43,7 +44,8 @@ void main() {
     final light = TaybahColors.background;
     TaybahColors.isDark = true;
     expect(TaybahColors.background, isNot(light));
-    expect(TaybahColors.background, TaybahColors.darkBg);
+    // الخلفية شفافة في الليلي لتظهر صورة المسجد النبوي خلفها
+    expect(TaybahColors.background, Colors.transparent);
     TaybahColors.isDark = false;
   });
 

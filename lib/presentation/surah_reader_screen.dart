@@ -104,7 +104,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           return Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: TaybahColors.surface,
+              color: TaybahColors.sheet,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -121,7 +121,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'حجم خط القرآن الكريم',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -133,7 +133,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                   children: [
                     Text(
                       'أصغر',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 14,
                         color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                       ),
@@ -155,7 +155,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                     ),
                     Text(
                       'أكبر',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -197,14 +197,14 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           children: [
             Text(
               'سورة $surahName',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               'رواية قالون عن نافع • $typeAr • $versesCount آية',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 11,
                 color: Theme.of(context).brightness == Brightness.dark
                     ? TaybahColors.darkTextMuted
@@ -328,7 +328,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                   ),
                   Text(
                     'رواية قالون عن نافع المدني',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 12,
                       color: TaybahColors.gold,
                       fontWeight: FontWeight.bold,
@@ -383,7 +383,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     'صدق الله العظيم',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 14,
                       color: TaybahColors.textMuted,
                       fontWeight: FontWeight.w600,
@@ -467,7 +467,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                     child: Center(
                       child: Text(
                         '$vId',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: isTarget
@@ -494,7 +494,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                           Clipboard.setData(ClipboardData(text: '﴿$text﴾ [${widget.surahMeta['name']}: $vId]'));
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('تم نسخ الآية الكريمة', style: GoogleFonts.cairo()),
+                              content: Text('تم نسخ الآية الكريمة', style: const TextStyle(fontFamily: TaybahFonts.ui)),
                               duration: const Duration(seconds: 1),
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -534,7 +534,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: TaybahColors.surface,
+          color: TaybahColors.sheet,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -551,7 +551,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
             const SizedBox(height: 18),
             Text(
               'مشاركة الآية الكريمة',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.primaryDark,
@@ -604,7 +604,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                     children: [
                       Text(
                         'سورة $surahName | آية $vId',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           color: TaybahColors.goldLight,
                           fontWeight: FontWeight.bold,
@@ -612,7 +612,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                       ),
                       Text(
                         'تطبيق طـيـبـة (قالون)',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 11,
                           color: Colors.white60,
                         ),
@@ -635,14 +635,14 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('تم نسخ نص الآية مع التوثيق للمشاركة', style: GoogleFonts.cairo()),
+                          content: Text('تم نسخ نص الآية مع التوثيق للمشاركة', style: const TextStyle(fontFamily: TaybahFonts.ui)),
                           backgroundColor: TaybahColors.primary,
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
                     },
                     icon: const Icon(Icons.share_rounded, size: 18),
-                    label: Text('نسخ للمشاركة', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                    label: Text('نسخ للمشاركة', style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

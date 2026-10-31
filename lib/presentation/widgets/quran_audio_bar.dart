@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../../data/quran_audio.dart';
 import '../../data/quran_player.dart';
@@ -82,14 +81,14 @@ class _Bar extends StatelessWidget {
                     Expanded(
                       child: Text(
                         player.error!,
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 11.5, color: Colors.white),
                       ),
                     ),
                     TextButton(
                       onPressed: () => player.playSurah(id ?? 1),
                       child: Text('إعادة',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                               color: TaybahColors.goldLight,
                               fontWeight: FontWeight.bold)),
                     ),
@@ -126,7 +125,7 @@ class _Bar extends StatelessWidget {
                                     : 'سورة ${player.surahName(id)}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -139,7 +138,7 @@ class _Bar extends StatelessWidget {
                                       player.reciter.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.cairo(
+                                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                                         fontSize: 11.5,
                                         color: TaybahColors.goldLight,
                                       ),
@@ -183,7 +182,7 @@ class _Bar extends StatelessWidget {
                   child: Row(
                   children: [
                     Text(_fmt(pos),
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 10.5, color: Colors.white70)),
                     Expanded(
                       child: SliderTheme(
@@ -208,7 +207,7 @@ class _Bar extends StatelessWidget {
                       ),
                     ),
                     Text(_fmt(total),
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 10.5, color: Colors.white70)),
                   ],
                   ),
@@ -333,11 +332,11 @@ class _Bar extends StatelessWidget {
               leading: Icon(Icons.record_voice_over_rounded,
                   color: TaybahColors.primary),
               title: Text('تغيير القارئ',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.textPrimary)),
               subtitle: Text(player.reciter.name,
-                  style: GoogleFonts.cairo(color: TaybahColors.textMuted)),
+                  style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textMuted)),
               onTap: () {
                 Navigator.pop(ctx);
                 ReciterPickerSheet.show(context);
@@ -347,11 +346,11 @@ class _Bar extends StatelessWidget {
               leading: Icon(Icons.download_for_offline_rounded,
                   color: TaybahColors.primary),
               title: Text('الاستماع بدون إنترنت',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.textPrimary)),
               subtitle: Text('تحميل التلاوات على الجهاز',
-                  style: GoogleFonts.cairo(color: TaybahColors.textMuted)),
+                  style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textMuted)),
               onTap: () {
                 Navigator.pop(ctx);
                 QuranDownloadsSheet.show(context);
@@ -360,7 +359,7 @@ class _Bar extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
               child: Text('سرعة التلاوة',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       color: TaybahColors.textPrimary)),
             ),
@@ -372,7 +371,7 @@ class _Bar extends StatelessWidget {
                   for (final s in const [0.75, 1.0, 1.25, 1.5])
                     ChoiceChip(
                       label: Text('×$s',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                               color: player.speed == s
                                   ? Colors.white
                                   : TaybahColors.textSecondary)),
@@ -403,7 +402,7 @@ class _Bar extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.timer_outlined, color: TaybahColors.primary),
               title: Text('إيقاف التلاوة بعد $m دقيقة',
-                  style: GoogleFonts.cairo(color: TaybahColors.textPrimary)),
+                  style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textPrimary)),
               onTap: () {
                 player.setSleepTimer(Duration(minutes: m));
                 Navigator.pop(ctx);
@@ -414,7 +413,7 @@ class _Bar extends StatelessWidget {
               leading: const Icon(Icons.timer_off_outlined,
                   color: Colors.redAccent),
               title: Text('إلغاء المؤقت',
-                  style: GoogleFonts.cairo(color: Colors.redAccent)),
+                  style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.redAccent)),
               onTap: () {
                 player.cancelSleepTimer();
                 Navigator.pop(ctx);
@@ -435,7 +434,7 @@ class _SheetFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: TaybahColors.surface,
+        color: TaybahColors.sheet,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
@@ -457,7 +456,7 @@ class _SheetFrame extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             child: Text(title,
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                     color: TaybahColors.textPrimary)),
@@ -507,7 +506,7 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
       constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.85),
       decoration: BoxDecoration(
-        color: TaybahColors.surface,
+        color: TaybahColors.sheet,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -528,17 +527,17 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
           ),
           const SizedBox(height: 14),
           Text('اختر القارئ',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: TaybahColors.textPrimary)),
           Text('المصحف المكتوب في التطبيق برواية قالون عن نافع',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 11.5, color: TaybahColors.textMuted)),
           const SizedBox(height: 12),
           TextField(
             onChanged: (v) => setState(() => _query = v.trim()),
-            style: GoogleFonts.cairo(color: TaybahColors.textPrimary),
+            style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textPrimary),
             decoration: InputDecoration(
               hintText: 'ابحث عن قارئ...',
               prefixIcon: Icon(Icons.search_rounded, color: TaybahColors.textMuted),
@@ -566,7 +565,7 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                           ),
                           const SizedBox(width: 8),
                           Text(riwaya.label,
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   color: TaybahColors.gold)),
@@ -594,13 +593,13 @@ class _ReciterPickerSheetState extends State<ReciterPickerSheet> {
                               backgroundColor: TaybahColors.primary,
                               child: Text(
                                 r.name.characters.first,
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
                             title: Text(r.name,
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: TaybahColors.textPrimary)),

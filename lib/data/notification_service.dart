@@ -504,7 +504,7 @@ class NotificationService {
   }
 
   String _prayerTitle(String key) => key == 'Sunrise'
-      ? '☀️ حان الآن وقت الشروق'
+      ? 'حان الآن وقت الشروق'
       : 'الله أكبر • حان الآن موعد أذان ${prayerNames[key]}';
 
   String _prayerBody(String key) => key == 'Sunrise'
@@ -655,7 +655,7 @@ class NotificationService {
           if (pre.isAfter(now)) {
             await _scheduleOne(
               id: _preId(d, pIdx),
-              title: '⏳ بقي $preMinutes دقيقة على أذان $name',
+              title: 'بقي $preMinutes دقيقة على أذان $name',
               body: 'استعد للصلاة وتوضأ • ﴿إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا﴾',
               when: pre,
               details: _simpleDetails(preAdhanChannelId, 'تنبيه قبل الأذان'),
@@ -671,7 +671,7 @@ class NotificationService {
           if (iqama.isAfter(now)) {
             await _scheduleOne(
               id: _iqamaId(d, pIdx),
-              title: '🕌 حان موعد إقامة صلاة $name',
+              title: 'حان موعد إقامة صلاة $name',
               body: 'قد قامت الصلاة • أقيموا صفوفكم',
               when: iqama,
               details: _simpleDetails(iqamaChannelId, 'تنبيه الإقامة'),
@@ -702,7 +702,7 @@ class NotificationService {
         await prefs.isMorningAdhkarReminderEnabled(),
         'Fajr',
         30,
-        '☀️ أذكار الصباح',
+        'أذكار الصباح',
         'ابدأ يومك بذكر الله وطمأنينة القلب',
         'adhkar_morning',
       ),
@@ -710,7 +710,7 @@ class NotificationService {
         await prefs.isEveningAdhkarReminderEnabled(),
         'Asr',
         20,
-        '🌙 أذكار المساء',
+        'أذكار المساء',
         '﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾',
         'adhkar_evening',
       ),
@@ -718,7 +718,7 @@ class NotificationService {
         await prefs.isSleepAdhkarReminderEnabled(),
         'Isha',
         120,
-        '✨ أذكار النوم وسورة الملك',
+        'أذكار النوم وسورة الملك',
         'اختم يومك بأذكار النوم وقراءة سورة الملك',
         'adhkar_sleep',
       ),
