@@ -145,7 +145,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                     color: TaybahColors.primaryTint,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on_rounded,
                     color: TaybahColors.primary,
                     size: 22,
@@ -175,7 +175,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: TaybahColors.textMuted),
+                  icon: Icon(Icons.close, color: TaybahColors.textMuted),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -277,7 +277,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
               onChanged: _filter,
               decoration: InputDecoration(
                 hintText: 'ابحث عن مدينة (مثلاً: زنتان، طرابلس، بنغازي...)',
-                prefixIcon: const Icon(Icons.search, color: TaybahColors.primary),
+                prefixIcon: Icon(Icons.search, color: TaybahColors.primary),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear, size: 18),
@@ -296,7 +296,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
           // Cities List
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: TaybahColors.primary),
                   )
                 : _filteredCities.isEmpty
@@ -313,7 +313,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                         ),
                         itemCount: _filteredCities.length,
                         separatorBuilder: (_, index) =>
-                            const Divider(height: 1, color: TaybahColors.border),
+                            Divider(height: 1, color: TaybahColors.border),
                         itemBuilder: (ctx, i) {
                           final city = _filteredCities[i];
                           final arName = city['ar_name'] ?? '';
@@ -368,7 +368,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                               ),
                             ),
                             trailing: isSelected
-                                ? const Icon(
+                                ? Icon(
                                     Icons.check_circle_rounded,
                                     color: TaybahColors.primary,
                                   )

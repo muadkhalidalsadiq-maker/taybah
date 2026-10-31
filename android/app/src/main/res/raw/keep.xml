@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- يمنع حذف صوت الأذان وأيقونة التنبيه عند ضغط الموارد في نسخة الإصدار (release) -->
+<!-- يمنع حذف أصوات الأذان والتنبيه وأيقونة الإشعار عند ضغط الموارد في نسخة الإصدار (release) -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@raw/adhan,@drawable/ic_stat_taybah" />
+    tools:keep="@raw/adhan_*,@raw/announce_*,@drawable/ic_stat_taybah" />

@@ -83,14 +83,12 @@ class _PrayerScreenState extends State<PrayerScreen>
     final next =
         await NotificationService.instance.togglePrayerNotification(key);
     setState(() => _prayerAlerts[key] = next);
-    if (_timings.isNotEmpty) {
-      NotificationService.instance.scheduleDailyPrayers(_timings);
-    }
     if (!mounted) return;
+    final prayerName = NotificationService.prayerNames[key] ?? key;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          next ? 'تم تفعيل إشعار أذان صلاة $key بنجاح ✓' : 'تم كتم إشعار صلاة $key',
+          next ? 'تم تفعيل تنبيه $prayerName ✓' : 'تم إيقاف تنبيه $prayerName',
           style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
         ),
         backgroundColor: next ? TaybahColors.primary : TaybahColors.textSecondary,
@@ -124,7 +122,7 @@ class _PrayerScreenState extends State<PrayerScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم إرسال إشعار تجريبي وتشغيل أذان $prayerName الآن.',
+              'تم إرسال إشعار تجريبي لأذان $prayerName بالصوت المختار.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
@@ -363,7 +361,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                     color: TaybahColors.primaryTint,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on_rounded,
                     color: TaybahColors.primary,
                     size: 20,
@@ -573,7 +571,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   color: TaybahColors.primaryTint,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_active_rounded,
                   color: TaybahColors.primary,
                   size: 22,
@@ -643,7 +641,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         const SizedBox(height: 12),
 
         if (_isLoading)
-          const Center(
+          Center(
             child: Padding(
               padding: EdgeInsets.all(32),
               child: CircularProgressIndicator(color: TaybahColors.primary),
@@ -927,7 +925,7 @@ class _PrayerScreenState extends State<PrayerScreen>
 
   Widget _buildNawafilTab() {
     if (_nawafil.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: TaybahColors.primary),
       );
     }
@@ -997,7 +995,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.auto_awesome,
                             size: 18,
                             color: TaybahColors.primary,

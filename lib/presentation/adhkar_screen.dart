@@ -68,7 +68,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: TaybahColors.primary),
             )
           : Column(
@@ -81,7 +81,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     onChanged: _filter,
                     decoration: InputDecoration(
                       hintText: 'ابحث في 135 باباً من أذكار حصن المسلم...',
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search_rounded,
                         color: TaybahColors.primary,
                       ),
@@ -209,7 +209,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: TaybahColors.textMuted,
                 size: 14,
@@ -298,7 +298,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                     value: progress,
                     minHeight: 6,
                     backgroundColor: TaybahColors.surfaceMuted,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
+                    valueColor: AlwaysStoppedAnimation<Color>(
                       TaybahColors.primary,
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme.dart';
 import '../../data/asset_loader.dart';
+import '../../data/quran_player.dart';
 import '../../data/shared_prefs_helper.dart';
 
 class QuranMushafView extends StatefulWidget {
@@ -72,6 +73,23 @@ class QuranMushafViewState extends State<QuranMushafView> {
         _fontSize = fSize;
         _isLoading = false;
       });
+    }
+  }
+
+  /// السورة التي تبدأ بها الصفحة الحالية.
+  int get currentSurahId {
+    final verses = _pageVersesMap[_currentPage];
+    if (verses == null || verses.isEmpty) return 1;
+    return verses.first['surahId'] as int;
+  }
+
+  void _listenToPage() {
+    final player = QuranPlayer.instance;
+    final id = currentSurahId;
+    if (player.isActive && player.surahId == id) {
+      player.togglePlay();
+    } else {
+      player.playSurah(id);
     }
   }
 
@@ -211,13 +229,54 @@ class QuranMushafViewState extends State<QuranMushafView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'الجُزْءُ $jozzNum',
-            style: GoogleFonts.cairo(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedBuilder(
+                animation: QuranPlayer.instance,
+                builder: (context, _) {
+                  final player = QuranPlayer.instance;
+                  final isThis =
+                      player.isActive && player.surahId == currentSurahId;
+                  return Material(
+                    color: TaybahColors.primary,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: _listenToPage,
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: isThis && player.isBuffering
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                isThis && player.isPlaying
+                                    ? Icons.pause_rounded
+                                    : Icons.headphones_rounded,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'الجُزْءُ $jozzNum',
+                style: GoogleFonts.cairo(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
+                ),
+              ),
+            ],
           ),
           Text(
             surahTitle,

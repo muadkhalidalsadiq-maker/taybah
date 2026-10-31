@@ -217,7 +217,7 @@ class _TasbeehScreenState extends State<TasbeehScreen> {
     if (_tasbeehList.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('المسبحة الإلكترونية')),
-        body: const Center(child: CircularProgressIndicator(color: TaybahColors.primary)),
+        body: Center(child: CircularProgressIndicator(color: TaybahColors.primary)),
       );
     }
 

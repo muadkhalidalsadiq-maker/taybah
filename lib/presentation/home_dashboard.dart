@@ -373,6 +373,9 @@ class _HomeTabState extends State<HomeTab> {
     }
 
     await _loadData();
+    // طلب إذن الإشعارات (أندرويد 13+ و iOS) حتى يصل الأذان فعلاً
+    await NotificationService.instance.requestPermissions(askExactAlarm: isFirst);
+    NotificationService.instance.rescheduleAll();
   }
 
   int? _loadedDay;
@@ -531,7 +534,7 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_rounded,
                                 size: 14,
                                 color: TaybahColors.primary,
@@ -597,7 +600,7 @@ class _HomeTabState extends State<HomeTab> {
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.settings_outlined,
                             size: 19,
                             color: TaybahColors.primary,
@@ -841,7 +844,7 @@ class _HomeTabState extends State<HomeTab> {
                                 color: TaybahColors.primaryTint,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.fact_check_rounded,
                                 size: 18,
                                 color: TaybahColors.primary,
@@ -926,7 +929,7 @@ class _HomeTabState extends State<HomeTab> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
                               TaybahColors.primary,
                               TaybahColors.primaryAccent,
@@ -982,7 +985,7 @@ class _HomeTabState extends State<HomeTab> {
                                 value: (((_lastRead?['jozz'] ?? 1) as int) / 30.0).clamp(0.0, 1.0),
                                 minHeight: 4,
                                 backgroundColor: TaybahColors.surfaceMuted,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                valueColor: AlwaysStoppedAnimation<Color>(
                                   TaybahColors.primary,
                                 ),
                               ),
@@ -1100,13 +1103,13 @@ class _HomeTabState extends State<HomeTab> {
                   _buildQuickCard(
                     title: 'القرآن الكريم',
                     icon: Icons.menu_book_rounded,
-                    gradient: const [TaybahColors.primary, TaybahColors.primaryAccent],
+                    gradient: [TaybahColors.primary, TaybahColors.primaryAccent],
                     onTap: () => widget.onSwitchTab(1),
                   ),
                   _buildQuickCard(
                     title: 'مواقيت الصلاة',
                     icon: Icons.mosque_rounded,
-                    gradient: const [TaybahColors.primaryDark, TaybahColors.primaryMedium],
+                    gradient: [TaybahColors.primaryDark, TaybahColors.primaryMedium],
                     onTap: () => widget.onSwitchTab(2),
                   ),
                   _buildQuickCard(
@@ -1212,7 +1215,7 @@ class _HomeTabState extends State<HomeTab> {
                       width: 58,
                       height: 58,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [
                             TaybahColors.primaryTint,
                             TaybahColors.primaryLight,
@@ -1298,7 +1301,7 @@ class _HomeTabState extends State<HomeTab> {
                                   color: TaybahColors.primaryTint,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.menu_book_sharp,
                                   size: 18,
                                   color: TaybahColors.primary,
@@ -1469,7 +1472,7 @@ class _HomeTabState extends State<HomeTab> {
             height: 46,
             decoration: BoxDecoration(
               gradient: isDone
-                  ? const LinearGradient(
+                  ? LinearGradient(
                       colors: [
                         TaybahColors.primary,
                         TaybahColors.primaryAccent,

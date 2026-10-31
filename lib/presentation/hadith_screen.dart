@@ -64,7 +64,7 @@ class _HadithScreenState extends State<HadithScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: TaybahColors.primary),
             )
           : ListView.separated(
