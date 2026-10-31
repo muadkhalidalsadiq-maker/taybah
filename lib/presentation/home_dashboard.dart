@@ -21,6 +21,7 @@ import 'ruqyah_screen.dart';
 import 'settings_screen.dart';
 
 import 'widgets/city_picker_sheet.dart';
+import 'widgets/glass.dart';
 import 'widgets/ui_kit.dart';
 
 class TaybahDashboard extends StatefulWidget {
@@ -79,9 +80,9 @@ class TaybahDashboardState extends State<TaybahDashboard> {
 
           // Floating Glassmorphic Bottom Navigation Bar (Ultra-clean, calm & simple)
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 20,
+            left: 22,
+            right: 22,
+            bottom: 18 + MediaQuery.of(context).padding.bottom,
             child: _buildFloatingGlassBar(),
           ),
         ],
@@ -89,6 +90,7 @@ class TaybahDashboardState extends State<TaybahDashboard> {
     );
   }
 
+  /// الشريط السفلي بزجاج سائل: كبسولة للأقسام + دائرة منفصلة للقبلة.
   Widget _buildFloatingGlassBar() {
     final dark = TaybahColors.isDark;
     const items = [
@@ -97,78 +99,99 @@ class TaybahDashboardState extends State<TaybahDashboard> {
       ('الصلاة', Icons.access_time_filled_rounded, Icons.access_time_rounded),
       ('الأذكار', Icons.auto_stories_rounded, Icons.auto_stories_outlined),
     ];
+    final active = dark ? TaybahColors.goldLight : TaybahColors.forest;
+    final idle = dark ? Colors.white.withAlpha(190) : const Color(0xFF26352B);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
-          decoration: BoxDecoration(
-            color: dark
-                ? const Color(0xD90B1610)
-                : Colors.white.withAlpha(235),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: dark ? Colors.white.withAlpha(18) : TaybahColors.border,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(dark ? 80 : 18),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Row(
-            children: List.generate(items.length, (i) {
-              final selected = selectedIndex == i;
-              final (label, on, off) = items[i];
-              final fg = selected
-                  ? (dark ? TaybahColors.goldLight : TaybahColors.forest)
-                  : TaybahColors.textMuted;
-              return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => setTab(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? (dark
-                              ? Colors.white.withAlpha(16)
-                              : TaybahColors.primaryTint)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(selected ? on : off, size: 22, color: fg),
-                        const SizedBox(height: 2),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontFamily: TaybahFonts.ui,
-                            fontSize: 11,
-                            height: 1.1,
-                            fontWeight:
-                                selected ? FontWeight.w700 : FontWeight.w500,
-                            color: fg,
+    return Row(
+      children: [
+        Expanded(
+          child: GlassContainer(
+            height: 62,
+            grouped: false,
+            blur: 18,
+            elevation: 1.2,
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(31)),
+            child: Row(
+              children: List.generate(items.length, (i) {
+                final selected = selectedIndex == i;
+                final (label, on, off) = items[i];
+                return Expanded(
+                  child: Tooltip(
+                    message: label,
+                    child: Semantics(
+                      label: label,
+                      selected: selected,
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => setTab(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutCubic,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: selected
+                                ? (dark
+                                    ? Colors.white.withAlpha(30)
+                                    : Colors.white.withAlpha(185))
+                                : Colors.transparent,
+                            boxShadow: selected && !dark
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withAlpha(14),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Center(
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 220),
+                              scale: selected ? 1.08 : 1,
+                              child: Icon(
+                                selected ? on : off,
+                                size: 25,
+                                color: selected ? active : idle,
+                              ),
+                            ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ),
-      ),
+        const SizedBox(width: 14),
+        Tooltip(
+          message: 'اتجاه القبلة',
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QiblaScreen()),
+              );
+            },
+            child: GlassContainer(
+              width: 62,
+              height: 62,
+              grouped: false,
+              blur: 18,
+              elevation: 1.2,
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: Center(
+                child: Icon(Icons.explore_outlined, size: 26, color: idle),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -558,24 +581,10 @@ class _HomeTabState extends State<HomeTab> {
 
     return GestureDetector(
       onTap: () => widget.onSwitchTab(2),
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: dark ? const Color(0xE60E2418) : TaybahColors.forest,
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(
-            color: dark
-                ? TaybahColors.gold.withAlpha(50)
-                : TaybahColors.forest,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: (dark ? Colors.black : TaybahColors.forest).withAlpha(dark ? 90 : 50),
-              blurRadius: 30,
-              offset: const Offset(0, 14),
-            ),
-          ],
-        ),
+      child: GlassContainer(
+        tint: dark ? const Color(0x8C0E2A1B) : const Color(0xD9183D24),
+        elevation: 1.4,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
         child: Stack(
           children: [
             Positioned.fill(

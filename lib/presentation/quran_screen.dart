@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
@@ -478,7 +479,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         final firstSurahName = surahsInJozz.isNotEmpty ? surahsInJozz.first['name'] : '';
         final startPage = surahsInJozz.isNotEmpty ? (surahsInJozz.first['start_page'] ?? 1) : 1;
 
-        return Container(
+        return GlassContainer(
           decoration: BoxDecoration(
             color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(18),
@@ -593,7 +594,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
               return InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () => _openVerseResult(res),
-                child: Container(
+                child: GlassContainer(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: TaybahColors.surface,

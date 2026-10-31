@@ -32,8 +32,7 @@ class TaybahColors {
       isDark ? const Color(0xFF2B2513) : const Color(0xFFFAF3DF);
 
   /// خلفية الشاشات. في الوضع الليلي شفافة لتظهر صورة المسجد النبوي خلفها.
-  static Color get background =>
-      isDark ? Colors.transparent : const Color(0xFFF7FAF8);
+  static Color get background => Colors.transparent;
 
   /// البطاقات: في الليلي شبه معتمة فتطفو فوق الصورة.
   static Color get surface => isDark ? const Color(0xE0101E17) : Colors.white;
@@ -70,7 +69,7 @@ class TaybahTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF7FAF8),
+      scaffoldBackgroundColor: Colors.transparent,
       fontFamily: TaybahFonts.ui,
       primaryColor: TaybahColors.primary,
       colorScheme: ColorScheme.light(

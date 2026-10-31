@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -77,7 +78,7 @@ class _HadithScreenState extends State<HadithScreen> {
                 final text = (h['text'] as String?) ?? '';
                 final narrator = h['narrator'] ?? '';
 
-                return Container(
+                return GlassContainer(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: TaybahColors.surface,
@@ -149,7 +150,7 @@ class _HadithScreenState extends State<HadithScreen> {
                         textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 14),
-                      Container(
+                      GlassContainer(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 8,

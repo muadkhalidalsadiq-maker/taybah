@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -55,7 +56,7 @@ class _DuasScreenState extends State<DuasScreen> {
                 final text = dua['dua'] ?? '';
                 final surah = dua['surah'] ?? '';
 
-                return Container(
+                return GlassContainer(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: TaybahColors.surface,

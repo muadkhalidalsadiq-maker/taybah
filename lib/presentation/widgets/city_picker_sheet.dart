@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'glass.dart';
 import '../../core/theme.dart';
 import '../../data/asset_loader.dart';
 import '../../data/prayer_api.dart';
@@ -222,7 +223,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
           // Summer / Winter time toggle
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: Container(
+            child: GlassContainer(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: BoxDecoration(
                 color: TaybahColors.surfaceMuted,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
 
-/// خلفية التطبيق في الوضع الليلي: صورة المسجد النبوي بشفافية خفيفة جداً،
-/// تحت طبقة ليلية داكنة، وتطفو فوقها البطاقات شبه الشفافة.
+/// خلفية التطبيق: صورة المسجد النبوي بشفافية خفيفة جداً تحت طبقة لونية،
+/// وفوقها تطفو البطاقات الزجاجية (Liquid Glass). في النهاري الصورة أخف بكثير،
+/// فقط ليعطي الزجاج لوناً ينكسر عليه.
 ///
 /// الصورة: Muhammad Mahdi Karim / www.micro2macro.net — رخصة الفن الحر (Free Art License).
 class TaybahBackdrop extends StatelessWidget {
@@ -15,22 +16,27 @@ class TaybahBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!dark) return child;
     return Stack(
       fit: StackFit.expand,
       children: [
-        const ColoredBox(color: TaybahColors.darkBg),
-        // الصورة بألوان هادئة وشفافية ضعيفة جداً
+        ColoredBox(
+            color: dark ? TaybahColors.darkBg : const Color(0xFFF4F7F2)),
         Opacity(
-          opacity: 0.24,
+          opacity: dark ? 0.26 : 0.30,
           child: ColorFiltered(
-            colorFilter: const ColorFilter.matrix(<double>[
-              // تقليل التشبع قليلاً مع ميل خفيف للأخضر
-              0.55, 0.30, 0.10, 0, 0,
-              0.20, 0.65, 0.15, 0, 0,
-              0.15, 0.30, 0.45, 0, 0,
-              0, 0, 0, 1, 0,
-            ]),
+            colorFilter: ColorFilter.matrix(dark
+                ? const <double>[
+                    0.55, 0.30, 0.10, 0, 0,
+                    0.20, 0.65, 0.15, 0, 0,
+                    0.15, 0.30, 0.45, 0, 0,
+                    0, 0, 0, 1, 0,
+                  ]
+                : const <double>[
+                    0.80, 0.15, 0.05, 0, 0,
+                    0.10, 0.85, 0.05, 0, 0,
+                    0.10, 0.15, 0.75, 0, 0,
+                    0, 0, 0, 1, 0,
+                  ]),
             child: Image.asset(
               imageAsset,
               fit: BoxFit.cover,
@@ -39,23 +45,30 @@ class TaybahBackdrop extends StatelessWidget {
             ),
           ),
         ),
-        // تدرج ليلي من الأعلى والأسفل حتى تبقى النصوص واضحة
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Color(0xCC07110C),
-                Color(0x6607110C),
-                Color(0x8007110C),
-                Color(0xF207110C),
-              ],
-              stops: [0.0, 0.35, 0.7, 1.0],
+              colors: dark
+                  ? const [
+                      Color(0xCC07110C),
+                      Color(0x6607110C),
+                      Color(0x8007110C),
+                      Color(0xF207110C),
+                    ]
+                  : const [
+                      Color(0xE6F4F7F2),
+                      Color(0x99F4F7F2),
+                      Color(0x80F4F7F2),
+                      Color(0xD9F4F7F2),
+                    ],
+              stops: const [0.0, 0.35, 0.7, 1.0],
             ),
           ),
         ),
-        child,
+        // كل البطاقات الزجاجية تشترك في قراءة واحدة للخلفية (أداء أفضل)
+        BackdropGroup(child: child),
       ],
     );
   }

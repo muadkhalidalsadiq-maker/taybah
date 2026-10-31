@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -155,7 +156,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
     // لون واحد من الهوية لكل الأيقونات بدل الألوان المتعددة
     iconColor = TaybahColors.isDark ? TaybahColors.goldLight : TaybahColors.forest;
 
-    return Container(
+    return GlassContainer(
       decoration: BoxDecoration(
         color: TaybahColors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -435,7 +436,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                                     },
                                   ),
                                   if (!done)
-                                    Container(
+                                    GlassContainer(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 10,
                                         vertical: 4,

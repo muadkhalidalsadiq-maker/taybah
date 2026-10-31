@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'glass.dart';
 import '../../core/theme.dart';
 import '../../data/alert_settings.dart';
 import '../../data/notification_service.dart';
@@ -112,7 +113,7 @@ class _AdhanReliabilityCardState extends State<AdhanReliabilityCard>
     if (!_loaded) return const SizedBox(height: 60);
     final allOk = _notif && _exact && _battery;
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: TaybahColors.surface,

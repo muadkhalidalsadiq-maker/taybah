@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/brand.dart';
@@ -313,7 +314,7 @@ class _AsmaAllahScreenState extends State<AsmaAllahScreen> {
     return InkWell(
       onTap: () => _showDetailModal(item),
       borderRadius: BorderRadius.circular(18),
-      child: Container(
+      child: GlassContainer(
         decoration: BoxDecoration(
           color: TaybahColors.surface,
           borderRadius: BorderRadius.circular(18),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -332,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }
 
-              return Container(
+              return GlassContainer(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: TaybahColors.surface,
@@ -458,7 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Prayer Times & Timing Adjustments Section
           _buildSectionHeader('ضبط المواقيت', Icons.access_time_filled_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -618,7 +619,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // ──── Hijri Calendar Adjustment Section ────
           _buildSectionHeader('التاريخ الهجري', Icons.calendar_month_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -711,7 +712,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Adhan & Notifications Section
           _buildSectionHeader('الأذان والتنبيهات', Icons.notifications_active_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -949,7 +950,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Quran Reading & Font Size Settings Section
           _buildSectionHeader('المصحف', Icons.menu_book_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -1016,7 +1017,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // ──── Additional Islamic Services Section ────
           _buildSectionHeader('أقسام أخرى', Icons.auto_awesome_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -1127,7 +1128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // About App & Credits Section
           _buildSectionHeader('عن التطبيق', Icons.info_outline_rounded),
-          Container(
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -1140,7 +1141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
+                    GlassContainer(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(

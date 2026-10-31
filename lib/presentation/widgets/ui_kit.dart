@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import 'glass.dart';
 
 /// عناصر الواجهة المشتركة: بطاقة، عنوان قسم، زخرفة هندسية.
 /// الهدف: لغة تصميم واحدة هادئة في كل الشاشات.
@@ -38,34 +39,12 @@ class TCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final r = radius ?? BorderRadius.circular(20);
-    final dark = TaybahColors.isDark;
-    return Container(
-      decoration: BoxDecoration(
-        color: color ?? TaybahColors.surface,
-        borderRadius: r,
-        border: Border.all(
-          color: dark ? Colors.white.withAlpha(16) : TaybahColors.border,
-        ),
-        boxShadow: dark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withAlpha(70),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: const Color(0xFF183D24).withAlpha(10),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-      ),
+    final r = radius ?? BorderRadius.circular(22);
+    return GlassContainer(
+      decoration: BoxDecoration(borderRadius: r),
+      tint: color,
       child: Material(
         color: Colors.transparent,
-        borderRadius: r,
         child: InkWell(
           borderRadius: r,
           onTap: onTap,

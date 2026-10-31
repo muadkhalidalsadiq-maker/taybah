@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
 import '../data/adhan_voices.dart';
@@ -333,7 +334,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         // City Selector Card
         GestureDetector(
           onTap: _openCityPicker,
-          child: Container(
+          child: GlassContainer(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -538,7 +539,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         const SizedBox(height: 16),
 
         // Adhan Notification Control Card
-        Container(
+        GlassContainer(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: TaybahColors.surface,
@@ -808,7 +809,7 @@ class _PrayerScreenState extends State<PrayerScreen>
       itemCount: _nawafil.length,
       itemBuilder: (ctx, i) {
         final n = _nawafil[i];
-        return Container(
+        return GlassContainer(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: TaybahColors.surface,
