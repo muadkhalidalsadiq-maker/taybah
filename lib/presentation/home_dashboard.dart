@@ -392,6 +392,7 @@ class _HomeTabState extends State<HomeTab> {
     final nTrack = await SharedPrefsHelper.instance.getDailyNawafilTracker(_getTodayKey());
     final hijriAdj = await SharedPrefsHelper.instance.getHijriAdjustment();
 
+    if (!mounted) return;
     setState(() {
       _cityName = name;
       _citySlug = slug;
@@ -428,14 +429,14 @@ class _HomeTabState extends State<HomeTab> {
     HapticFeedback.lightImpact();
     await SharedPrefsHelper.instance.togglePrayerTracker(_getTodayKey(), prayerKey);
     final pTrack = await SharedPrefsHelper.instance.getDailyPrayerTracker(_getTodayKey());
-    setState(() => _prayerTracker = pTrack);
+    if (mounted) setState(() => _prayerTracker = pTrack);
   }
 
   Future<void> _toggleNafl(String naflKey) async {
     HapticFeedback.lightImpact();
     await SharedPrefsHelper.instance.toggleNaflTracker(_getTodayKey(), naflKey);
     final nTrack = await SharedPrefsHelper.instance.getDailyNawafilTracker(_getTodayKey());
-    setState(() => _nawafilTracker = nTrack);
+    if (mounted) setState(() => _nawafilTracker = nTrack);
   }
 
   @override

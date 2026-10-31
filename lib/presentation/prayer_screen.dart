@@ -177,6 +177,7 @@ class _PrayerScreenState extends State<PrayerScreen>
     final name = await SharedPrefsHelper.instance.getSelectedCityName();
     final slug = await SharedPrefsHelper.instance.getSelectedCitySlug();
     final summer = await SharedPrefsHelper.instance.isSummerTime();
+    if (!mounted) return;
     setState(() {
       _cityName = name;
       _citySlug = slug;
