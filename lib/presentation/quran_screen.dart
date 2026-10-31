@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
+import '../data/quran_player.dart';
 import '../data/shared_prefs_helper.dart';
+import 'surah_reader_screen.dart';
+import 'widgets/quran_audio_bar.dart';
 import 'widgets/quran_mushaf_view.dart';
 
 class QuranScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _loadData();
+    QuranPlayer.instance.loadSaved();
   }
 
   @override
@@ -150,25 +154,36 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
           'القرآن الكريم (رواية قالون)',
           style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'اختيار القارئ',
+            icon: const Icon(Icons.record_voice_over_rounded),
+            onPressed: () => ReciterPickerSheet.show(context),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: TaybahColors.gold,
           indicatorWeight: 3,
           labelColor: isDark ? TaybahColors.goldLight : TaybahColors.primary,
           unselectedLabelColor: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
-          labelStyle: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
-          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 12),
+          labelStyle: GoogleFonts.cairo(fontSize: 14, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 14),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: const [
-            Tab(text: 'المصحف (صفحات)'),
-            Tab(text: 'السور (114)'),
-            Tab(text: 'الأجزاء (30)'),
-            Tab(text: 'البحث 🔍'),
+            Tab(text: 'المصحف'),
+            Tab(text: 'السور'),
+            Tab(text: 'الأجزاء'),
+            Tab(text: 'البحث'),
           ],
         ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: TaybahColors.gold))
-          : TabBarView(
+          : Column(
+              children: [
+                Expanded(
+                  child: TabBarView(
               controller: _tabController,
               children: [
                 QuranMushafView(
@@ -182,6 +197,12 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                 _buildSurahTab(isDark),
                 _buildJozzTab(isDark),
                 _buildVerseSearchTab(isDark),
+              ],
+                  ),
+                ),
+                const QuranAudioBar(),
+                // مساحة شريط التنقل العائم أسفل الشاشة
+                const SizedBox(height: 86),
               ],
             ),
     );
@@ -287,7 +308,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                   child: Text('لا توجد سورة مطابقة', style: GoogleFonts.cairo(color: Colors.grey)),
                 )
               : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
                   itemCount: _filteredSurahs.length,
                   separatorBuilder: (_, index) => Divider(
                     height: 1,
@@ -304,6 +325,13 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       onTap: () => _openSurah(surah),
+                      // ضغطة مطولة: قراءة السورة آية بآية
+                      onLongPress: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SurahReaderScreen(surahMeta: surah),
+                        ),
+                      ),
                       leading: Container(
                         width: 44,
                         height: 44,
@@ -343,6 +371,27 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          AnimatedBuilder(
+                            animation: QuranPlayer.instance,
+                            builder: (context, _) {
+                              final player = QuranPlayer.instance;
+                              final isThis =
+                                  player.isActive && player.surahId == id;
+                              return IconButton(
+                                tooltip: 'استماع لسورة $name',
+                                icon: Icon(
+                                  isThis && player.isPlaying
+                                      ? Icons.pause_circle_filled_rounded
+                                      : Icons.play_circle_fill_rounded,
+                                  color: TaybahColors.gold,
+                                  size: 32,
+                                ),
+                                onPressed: () => isThis
+                                    ? player.togglePlay()
+                                    : player.playSurah(id),
+                              );
+                            },
+                          ),
                           Text(
                             'صـ $page',
                             style: GoogleFonts.cairo(
@@ -369,7 +418,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
 
   Widget _buildJozzTab(bool isDark) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       itemCount: 30,
       separatorBuilder: (_, index) => const SizedBox(height: 10),
       itemBuilder: (ctx, i) {
@@ -380,7 +429,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
 
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? TaybahColors.darkSurface : Colors.white,
+            color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: isDark ? TaybahColors.darkBorder : TaybahColors.border),
           ),
@@ -480,7 +529,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         // Results List
         Expanded(
           child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
             itemCount: _verseSearchResults.length,
             separatorBuilder: (_, index) => const SizedBox(height: 10),
             itemBuilder: (ctx, i) {
@@ -496,7 +545,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? TaybahColors.darkSurface : Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: isDark ? TaybahColors.darkBorder : TaybahColors.border,

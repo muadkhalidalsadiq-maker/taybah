@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hijri/hijri_calendar.dart';
 import '../core/brand.dart';
 import '../core/theme.dart';
 import '../data/prayer_api.dart';
@@ -300,29 +301,29 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   String _getHijriDateApprox() {
-    final now = DateTime.now().add(Duration(days: _hijriAdjustment));
-    final gregorianDays = now.difference(DateTime(622, 7, 16)).inDays;
-    final hijriYear = (gregorianDays / 354.36667).floor();
-    final daysInYear = (gregorianDays % 354.36667).floor();
-    final hijriMonth = (daysInYear / 29.53).floor() + 1;
-    final hijriDay = (daysInYear % 29.53).floor() + 1;
-    const hijriMonths = [
-      'محرم',
-      'صفر',
-      'ربيع الأول',
-      'ربيع الثاني',
-      'جمادى الأولى',
-      'جمادى الآخرة',
-      'رجب',
-      'شعبان',
-      'رمضان',
-      'شوال',
-      'ذو القعدة',
-      'ذو الحجة'
-    ];
-    final monthName = hijriMonths[(hijriMonth - 1).clamp(0, 11)];
-    return '$hijriDay $monthName $hijriYearهـ';
+    final d = DateTime.now().add(Duration(days: _hijriAdjustment));
+    try {
+      final h = HijriCalendar.fromDate(d);
+      return '${h.hDay} ${_hijriMonths[h.hMonth - 1]} ${h.hYear}هـ';
+    } catch (_) {
+      return '';
+    }
   }
+
+  static const List<String> _hijriMonths = [
+    'محرم',
+    'صفر',
+    'ربيع الأول',
+    'ربيع الآخر',
+    'جمادى الأولى',
+    'جمادى الآخرة',
+    'رجب',
+    'شعبان',
+    'رمضان',
+    'شوال',
+    'ذو القعدة',
+    'ذو الحجة',
+  ];
 
   String _getTodayKey() {
     final now = DateTime.now();
@@ -373,6 +374,9 @@ class _HomeTabState extends State<HomeTab> {
     }
 
     await _loadData();
+    // طلب إذن الإشعارات (أندرويد 13+ و iOS) حتى يصل الأذان فعلاً
+    await NotificationService.instance.requestPermissions(askExactAlarm: isFirst);
+    NotificationService.instance.rescheduleAll();
   }
 
   int? _loadedDay;
@@ -387,6 +391,7 @@ class _HomeTabState extends State<HomeTab> {
     final nTrack = await SharedPrefsHelper.instance.getDailyNawafilTracker(_getTodayKey());
     final hijriAdj = await SharedPrefsHelper.instance.getHijriAdjustment();
 
+    if (!mounted) return;
     setState(() {
       _cityName = name;
       _citySlug = slug;
@@ -423,14 +428,14 @@ class _HomeTabState extends State<HomeTab> {
     HapticFeedback.lightImpact();
     await SharedPrefsHelper.instance.togglePrayerTracker(_getTodayKey(), prayerKey);
     final pTrack = await SharedPrefsHelper.instance.getDailyPrayerTracker(_getTodayKey());
-    setState(() => _prayerTracker = pTrack);
+    if (mounted) setState(() => _prayerTracker = pTrack);
   }
 
   Future<void> _toggleNafl(String naflKey) async {
     HapticFeedback.lightImpact();
     await SharedPrefsHelper.instance.toggleNaflTracker(_getTodayKey(), naflKey);
     final nTrack = await SharedPrefsHelper.instance.getDailyNawafilTracker(_getTodayKey());
-    setState(() => _nawafilTracker = nTrack);
+    if (mounted) setState(() => _nawafilTracker = nTrack);
   }
 
   @override
@@ -451,7 +456,8 @@ class _HomeTabState extends State<HomeTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  Expanded(
+                    child: Row(
                     children: [
                       // Official Logo Avatar
                       Container(
@@ -459,7 +465,7 @@ class _HomeTabState extends State<HomeTab> {
                         height: 48,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: TaybahColors.surface,
                           border: Border.all(
                             color: TaybahColors.borderGlow,
                             width: 1.5,
@@ -482,20 +488,28 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Column(
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
                             _getGreeting(),
+                            maxLines: 1,
                             style: GoogleFonts.cairo(
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: TaybahColors.primaryDark,
                             ),
                           ),
+                          ),
                           Text(
                             _getHijriDateApprox(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.cairo(
                               fontSize: 12,
                               color: TaybahColors.gold,
@@ -504,8 +518,11 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                         ],
                       ),
+                      ),
                     ],
                   ),
+                  ),
+                  const SizedBox(width: 8),
 
                   // Actions: City Badge & Settings Button
                   Row(
@@ -518,7 +535,7 @@ class _HomeTabState extends State<HomeTab> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: TaybahColors.surface,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: TaybahColors.border),
                             boxShadow: [
@@ -531,7 +548,7 @@ class _HomeTabState extends State<HomeTab> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_rounded,
                                 size: 14,
                                 color: TaybahColors.primary,
@@ -586,7 +603,7 @@ class _HomeTabState extends State<HomeTab> {
                         child: Container(
                           padding: const EdgeInsets.all(7),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: TaybahColors.surface,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(color: TaybahColors.border),
                             boxShadow: [
@@ -597,7 +614,7 @@ class _HomeTabState extends State<HomeTab> {
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.settings_outlined,
                             size: 19,
                             color: TaybahColors.primary,
@@ -625,17 +642,19 @@ class _HomeTabState extends State<HomeTab> {
                               const Color(0xFF15803D), // Vibrant active green when prayer/iqama is active
                               const Color(0xFF166534),
                             ]
-                          : [
-                              TaybahColors.primaryDark,
-                              TaybahColors.primaryMedium,
-                            ],
+                          : TaybahColors.isDark
+                              ? const [Color(0xFF173A26), Color(0xFF0A1A11)]
+                              : const [
+                                  TaybahColors.forestDeep,
+                                  TaybahColors.primaryMedium,
+                                ],
                     ),
                     borderRadius: BorderRadius.circular(26),
                     boxShadow: [
                       BoxShadow(
                         color: (nextPrayer['isBetweenAdhanAndIqama'] == true)
                             ? const Color(0xFF15803D).withAlpha(80)
-                            : TaybahColors.primaryDark.withAlpha(55),
+                            : TaybahColors.forestDeep.withAlpha(55),
                         blurRadius: 22,
                         offset: const Offset(0, 10),
                       ),
@@ -816,7 +835,7 @@ class _HomeTabState extends State<HomeTab> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: TaybahColors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: TaybahColors.border),
                   boxShadow: [
@@ -841,7 +860,7 @@ class _HomeTabState extends State<HomeTab> {
                                 color: TaybahColors.primaryTint,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.fact_check_rounded,
                                 size: 18,
                                 color: TaybahColors.primary,
@@ -910,7 +929,7 @@ class _HomeTabState extends State<HomeTab> {
                 child: Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: TaybahColors.border),
                     boxShadow: [
@@ -926,7 +945,7 @@ class _HomeTabState extends State<HomeTab> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
                               TaybahColors.primary,
                               TaybahColors.primaryAccent,
@@ -982,7 +1001,7 @@ class _HomeTabState extends State<HomeTab> {
                                 value: (((_lastRead?['jozz'] ?? 1) as int) / 30.0).clamp(0.0, 1.0),
                                 minHeight: 4,
                                 backgroundColor: TaybahColors.surfaceMuted,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                valueColor: AlwaysStoppedAnimation<Color>(
                                   TaybahColors.primary,
                                 ),
                               ),
@@ -1020,7 +1039,7 @@ class _HomeTabState extends State<HomeTab> {
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: TaybahColors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: TaybahColors.border),
                   boxShadow: [
@@ -1100,13 +1119,13 @@ class _HomeTabState extends State<HomeTab> {
                   _buildQuickCard(
                     title: 'القرآن الكريم',
                     icon: Icons.menu_book_rounded,
-                    gradient: const [TaybahColors.primary, TaybahColors.primaryAccent],
+                    gradient: [TaybahColors.primary, TaybahColors.primaryAccent],
                     onTap: () => widget.onSwitchTab(1),
                   ),
                   _buildQuickCard(
                     title: 'مواقيت الصلاة',
                     icon: Icons.mosque_rounded,
-                    gradient: const [TaybahColors.primaryDark, TaybahColors.primaryMedium],
+                    gradient: [TaybahColors.forestDeep, TaybahColors.primaryMedium],
                     onTap: () => widget.onSwitchTab(2),
                   ),
                   _buildQuickCard(
@@ -1195,7 +1214,7 @@ class _HomeTabState extends State<HomeTab> {
                 child: Container(
                   padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: TaybahColors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: TaybahColors.border),
                   boxShadow: [
@@ -1212,7 +1231,7 @@ class _HomeTabState extends State<HomeTab> {
                       width: 58,
                       height: 58,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           colors: [
                             TaybahColors.primaryTint,
                             TaybahColors.primaryLight,
@@ -1273,7 +1292,7 @@ class _HomeTabState extends State<HomeTab> {
                 return Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: TaybahColors.border),
                     boxShadow: [
@@ -1298,7 +1317,7 @@ class _HomeTabState extends State<HomeTab> {
                                   color: TaybahColors.primaryTint,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.menu_book_sharp,
                                   size: 18,
                                   color: TaybahColors.primary,
@@ -1364,7 +1383,7 @@ class _HomeTabState extends State<HomeTab> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: TaybahColors.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(color: TaybahColors.border),
                   boxShadow: [
@@ -1469,7 +1488,7 @@ class _HomeTabState extends State<HomeTab> {
             height: 46,
             decoration: BoxDecoration(
               gradient: isDone
-                  ? const LinearGradient(
+                  ? LinearGradient(
                       colors: [
                         TaybahColors.primary,
                         TaybahColors.primaryAccent,
@@ -1650,7 +1669,7 @@ class _HomeTabState extends State<HomeTab> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: TaybahColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: TaybahColors.border),
         boxShadow: [

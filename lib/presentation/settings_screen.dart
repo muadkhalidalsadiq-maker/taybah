@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../core/theme.dart';
+import '../data/adhan_voices.dart';
 import '../data/notification_service.dart';
 import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
@@ -10,6 +11,7 @@ import '../main.dart';
 import 'asma_allah_screen.dart';
 import 'qibla_screen.dart';
 import 'ruqyah_screen.dart';
+import 'widgets/adhan_voice_picker.dart';
 import 'widgets/city_picker_sheet.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -29,7 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   double _quranFontSize = 26.0;
   bool _isGpsDetecting = false;
   int _hijriAdjustment = 0;
-  String _adhanSound = 'default';
+  AdhanVoice _adhanVoice = AdhanVoices.all.first;
 
   Map<String, int> _offsets = {
     'Fajr': 0,
@@ -83,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     final hijri = await SharedPrefsHelper.instance.getHijriAdjustment();
-    final adhan = await SharedPrefsHelper.instance.getAdhanSound();
+    final adhan = await AdhanVoices.getSelected();
 
     if (mounted) {
       setState(() {
@@ -96,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _isEveningReminder = evening;
         _isSleepReminder = sleep;
         _hijriAdjustment = hijri;
-        _adhanSound = adhan;
+        _adhanVoice = adhan;
       });
     }
   }
@@ -110,10 +112,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     HapticFeedback.lightImpact();
   }
 
-  Future<void> _updateAdhanSound(String sound) async {
-    setState(() => _adhanSound = sound);
-    await SharedPrefsHelper.instance.setAdhanSound(sound);
-    HapticFeedback.lightImpact();
+  Future<void> _pickAdhanVoice() async {
+    final picked = await AdhanVoicePickerSheet.show(context);
+    if (picked != null && mounted) setState(() => _adhanVoice = picked);
   }
 
   Future<void> _openCityPicker() async {
@@ -123,6 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (selected != null) {
       await _loadAllSettings();
+      NotificationService.instance.rescheduleAll();
     }
   }
 
@@ -135,6 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (nearest != null) {
       await _loadAllSettings();
+      NotificationService.instance.rescheduleAll();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -157,6 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _toggleSummer(bool val) async {
     setState(() => _isSummer = val);
     await SharedPrefsHelper.instance.setSummerTime(val);
+    NotificationService.instance.rescheduleAll();
   }
 
   Future<void> _changeOffset(String key, int delta) async {
@@ -165,6 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _offsets[key] = next);
     await SharedPrefsHelper.instance.setPrayerOffset(key, next);
     HapticFeedback.lightImpact();
+    NotificationService.instance.rescheduleAll();
   }
 
   Future<void> _resetOffsets() async {
@@ -182,6 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       };
     });
     HapticFeedback.mediumImpact();
+    NotificationService.instance.rescheduleAll();
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -192,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _togglePrayerAlert(String key, bool val) async {
     setState(() => _prayerAlerts[key] = val);
-    await NotificationService.instance.togglePrayerNotification(key);
+    await NotificationService.instance.setPrayerNotification(key, val);
   }
 
   Future<void> _testAdhan() async {
@@ -220,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم إرسال إشعار أذان تجريبي وتشغيل صوت الأذان الآن.',
+              'تم إرسال إشعار أذان تجريبي بصوت ${_adhanVoice.name}.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
@@ -277,64 +283,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSectionHeader('المظهر والوضع الليلي', Icons.palette_rounded),
           Consumer<AppState>(
             builder: (context, appState, child) {
-              final isDark = appState.isDark;
-              return Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: isDark ? TaybahColors.darkSurface : Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
+              final mode = appState.themeMode;
+              Widget option(ThemeMode m, IconData icon, String label) {
+                final selected = mode == m;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      appState.setThemeMode(m);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? TaybahColors.primary
+                            : TaybahColors.surfaceMuted,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: selected
+                              ? TaybahColors.gold
+                              : TaybahColors.border,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(icon,
+                              color: selected
+                                  ? TaybahColors.goldLight
+                                  : TaybahColors.textMuted),
+                          const SizedBox(height: 4),
+                          Text(
+                            label,
+                            style: GoogleFonts.cairo(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.bold,
+                              color: selected
+                                  ? Colors.white
+                                  : TaybahColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
+                );
+              }
+
+              return Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: TaybahColors.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: TaybahColors.border),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? TaybahColors.gold.withAlpha(40)
-                                : TaybahColors.primaryTint,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                            color: isDark ? TaybahColors.goldLight : TaybahColors.primary,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isDark ? 'الوضع الليلي الفاخر (مفعّل)' : 'الوضع النهاري المضيء',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
-                              ),
-                            ),
-                            Text(
-                              isDark ? 'تصميم زمردي مريح للعين ليلاً' : 'ألوان هادئة ونقية ومشرقة',
-                              style: GoogleFonts.cairo(
-                                fontSize: 11,
-                                color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Switch(
-                      value: isDark,
-                      activeThumbColor: TaybahColors.gold,
-                      activeTrackColor: TaybahColors.primaryAccent,
-                      onChanged: (_) => appState.toggleTheme(),
-                    ),
+                    option(ThemeMode.light, Icons.light_mode_rounded, 'نهاري'),
+                    const SizedBox(width: 8),
+                    option(ThemeMode.dark, Icons.dark_mode_rounded, 'ليلي'),
+                    const SizedBox(width: 8),
+                    option(ThemeMode.system, Icons.brightness_auto_rounded, 'حسب الهاتف'),
                   ],
                 ),
               );
@@ -404,14 +413,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Divider(height: 1, color: TaybahColors.border),
+                Divider(height: 1, color: TaybahColors.border),
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: _isGpsDetecting ? null : _autoDetectGps,
                     icon: _isGpsDetecting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
@@ -431,7 +440,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: TaybahColors.primaryLight),
+                      side: BorderSide(color: TaybahColors.primaryLight),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -450,7 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: TaybahColors.border),
             ),
@@ -478,8 +487,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             Text(
                               _isSummer
-                                  ? 'التوقيت الصيفي (الأوائل ?s=2)'
-                                  : 'التوقيت الشتوي (الأوائل ?s=1)',
+                                  ? 'التوقيت الصيفي'
+                                  : 'التوقيت الشتوي',
                               style: GoogleFonts.cairo(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -507,7 +516,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
 
-                const Divider(height: 24, color: TaybahColors.border),
+                Divider(height: 24, color: TaybahColors.border),
 
                 // Manual minutes offset
                 Row(
@@ -610,7 +619,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -697,7 +706,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -744,6 +753,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() => _isNotificationsMaster = val);
                         await SharedPrefsHelper.instance
                             .setNotificationsEnabled(val);
+                        if (val) {
+                          await NotificationService.instance
+                              .requestPermissions();
+                        }
+                        await NotificationService.instance.rescheduleAll();
                       },
                     ),
                   ],
@@ -753,38 +767,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(height: 1),
                 const SizedBox(height: 12),
 
-                // Adhan Sound Selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'صوت الأذان المفضل',
-                      style: GoogleFonts.cairo(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
+                // Adhan Voice Selector
+                Material(
+                  color: TaybahColors.primaryTint,
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: _pickAdhanVoice,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: TaybahColors.primary,
+                              borderRadius: BorderRadius.circular(13),
+                            ),
+                            child: const Icon(Icons.record_voice_over_rounded,
+                                color: TaybahColors.goldLight, size: 22),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'صوت الأذان',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 11.5,
+                                    color: TaybahColors.textMuted,
+                                  ),
+                                ),
+                                Text(
+                                  _adhanVoice.name,
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: TaybahColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            'تغيير',
+                            style: GoogleFonts.cairo(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.bold,
+                              color: TaybahColors.gold,
+                            ),
+                          ),
+                          const Icon(Icons.chevron_left_rounded,
+                              color: TaybahColors.gold),
+                        ],
                       ),
                     ),
-                    DropdownButton<String>(
-                      value: _adhanSound,
-                      dropdownColor: isDark ? TaybahColors.darkSurface : Colors.white,
-                      underline: const SizedBox(),
-                      style: GoogleFonts.cairo(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.bold,
-                        color: TaybahColors.gold,
-                      ),
-                      items: const [
-                        DropdownMenuItem(value: 'default', child: Text('الأذان الافتراضي')),
-                        DropdownMenuItem(value: 'makkah', child: Text('أذان الحرم المكي')),
-                        DropdownMenuItem(value: 'madinah', child: Text('أذان الحرم المدني')),
-                        DropdownMenuItem(value: 'aqsa', child: Text('أذان المسجد الأقصى')),
-                      ],
-                      onChanged: (val) {
-                        if (val != null) _updateAdhanSound(val);
-                      },
-                    ),
-                  ],
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -808,7 +848,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
 
-                const Divider(height: 24, color: TaybahColors.border),
+                Divider(height: 24, color: TaybahColors.border),
 
                 // Per-prayer toggles
                 Text(
@@ -839,7 +879,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   );
                 }),
 
-                const Divider(height: 20, color: TaybahColors.border),
+                Divider(height: 20, color: TaybahColors.border),
 
                 // Adhkar reminders
                 SwitchListTile(
@@ -855,6 +895,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() => _isMorningReminder = val);
                     await SharedPrefsHelper.instance
                         .setMorningAdhkarReminderEnabled(val);
+                    await NotificationService.instance
+                        .scheduleDailyAzkarReminders();
                   },
                 ),
                 SwitchListTile(
@@ -870,6 +912,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() => _isEveningReminder = val);
                     await SharedPrefsHelper.instance
                         .setEveningAdhkarReminderEnabled(val);
+                    await NotificationService.instance
+                        .scheduleDailyAzkarReminders();
                   },
                 ),
                 SwitchListTile(
@@ -885,6 +929,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() => _isSleepReminder = val);
                     await SharedPrefsHelper.instance
                         .setSleepAdhkarReminderEnabled(val);
+                    await NotificationService.instance
+                        .scheduleDailyAzkarReminders();
                   },
                 ),
               ],
@@ -898,7 +944,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: TaybahColors.border),
             ),
@@ -965,7 +1011,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -1076,7 +1122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -1089,9 +1135,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       width: 48,
                       height: 48,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: TaybahColors.surface,
                       ),
                       child: ClipOval(
                         child: Image.asset('assets/images/logo.png'),

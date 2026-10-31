@@ -42,7 +42,7 @@ class _DuasScreenState extends State<DuasScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: TaybahColors.primary),
             )
           : ListView.separated(
@@ -58,7 +58,7 @@ class _DuasScreenState extends State<DuasScreen> {
                 return Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: TaybahColors.border),
                   ),
@@ -83,7 +83,7 @@ class _DuasScreenState extends State<DuasScreen> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.auto_stories_rounded,
                                   size: 16,
                                   color: TaybahColors.primary,

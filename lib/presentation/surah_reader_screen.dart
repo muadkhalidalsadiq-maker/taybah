@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
-import '../data/quran_audio.dart';
+import '../data/quran_player.dart';
+import 'widgets/quran_audio_bar.dart';
 import '../data/shared_prefs_helper.dart';
 
 class SurahReaderScreen extends StatefulWidget {
@@ -22,14 +22,9 @@ class SurahReaderScreen extends StatefulWidget {
 }
 
 class _SurahReaderScreenState extends State<SurahReaderScreen> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
   final ScrollController _scrollController = ScrollController();
   Map<String, dynamic>? _surahData;
   bool _isLoading = true;
-  bool _isPlaying = false;
-  bool _isLoadingAudio = false;
-  bool _audioReady = false; // تم تحميل مصدر التلاوة وجاهز للتشغيل/الاستكمال
-  QuranReciter _reciter = QuranAudio.reciters.first;
   double _fontSize = 26.0;
   bool _isMushafMode = true; // true: continuous mushaf, false: verse-by-verse
 
@@ -39,27 +34,12 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
     _loadSurah();
     _loadSettings();
 
-    QuranAudio.getSelectedReciter().then((r) {
-      if (mounted) setState(() => _reciter = r);
-    });
-
-    _audioPlayer.playerStateStream.listen((state) {
-      if (!mounted) return;
-      if (state.processingState == ProcessingState.completed) {
-        // انتهت السورة: نرجع للبداية ونوقف التشغيل
-        _audioPlayer.pause();
-        _audioPlayer.seek(Duration.zero);
-      }
-      setState(() {
-        _isPlaying = state.playing &&
-            state.processingState != ProcessingState.completed;
-      });
-    });
+    QuranPlayer.instance.loadSaved();
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -105,306 +85,13 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
   }
 
   Future<void> _toggleAudio() async {
-    if (_isLoadingAudio) return;
-
-    if (_isPlaying) {
-      await _audioPlayer.pause();
-      return;
+    final player = QuranPlayer.instance;
+    final sId = (widget.surahMeta['id'] as num).toInt();
+    if (player.isActive && player.surahId == sId) {
+      await player.togglePlay();
+    } else {
+      await player.playSurah(sId);
     }
-
-    // استكمال التلاوة من حيث توقفت بدون إعادة التحميل
-    if (_audioReady) {
-      _audioPlayer.play();
-      return;
-    }
-
-    setState(() => _isLoadingAudio = true);
-    try {
-      final sId = (widget.surahMeta['id'] as num).toInt();
-      await _audioPlayer
-          .setUrl(_reciter.urlForSurah(sId))
-          .timeout(const Duration(seconds: 20));
-      if (!mounted) return;
-      setState(() {
-        _audioReady = true;
-        _isLoadingAudio = false;
-      });
-      // لا ننتظر play() لأنها لا تنتهي إلا بانتهاء التلاوة
-      _audioPlayer.play();
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingAudio = false;
-          _audioReady = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'تعذر تشغيل تلاوة ${_reciter.name}. تأكد من الاتصال بالإنترنت أو جرّب قارئاً آخر.',
-              style: GoogleFonts.cairo(fontSize: 13),
-            ),
-            action: SnackBarAction(
-              label: 'تغيير القارئ',
-              onPressed: _showReciterPicker,
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _changeReciter(QuranReciter reciter) async {
-    await QuranAudio.setSelectedReciter(reciter.id);
-    await _audioPlayer.stop();
-    if (!mounted) return;
-    setState(() {
-      _reciter = reciter;
-      _audioReady = false;
-      _isPlaying = false;
-    });
-    await _toggleAudio();
-  }
-
-  void _showReciterPicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: isDark ? TaybahColors.darkSurface : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 14),
-            Text(
-              'اختر القارئ • رواية قالون عن نافع',
-              style: GoogleFonts.cairo(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  for (final r in QuranAudio.reciters)
-                    ListTile(
-                      leading: Icon(
-                        r.id == _reciter.id
-                            ? Icons.radio_button_checked_rounded
-                            : Icons.radio_button_off_rounded,
-                        color: r.id == _reciter.id
-                            ? TaybahColors.gold
-                            : (isDark
-                                ? TaybahColors.darkTextMuted
-                                : TaybahColors.textMuted),
-                      ),
-                      title: Text(
-                        r.name,
-                        style: GoogleFonts.cairo(
-                          fontSize: 14,
-                          fontWeight: r.id == _reciter.id
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: isDark
-                              ? TaybahColors.darkTextPrimary
-                              : TaybahColors.textPrimary,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _changeReciter(r);
-                      },
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDuration(Duration d) {
-    final h = d.inHours;
-    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final sec = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return h > 0 ? '$h:$m:$sec' : '$m:$sec';
-  }
-
-  /// شريط مشغّل التلاوة أسفل الشاشة
-  Widget _buildAudioBar() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? TaybahColors.darkSurface : Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
-          ),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              StreamBuilder<Duration>(
-                stream: _audioPlayer.positionStream,
-                builder: (context, snapshot) {
-                  final total = _audioPlayer.duration ?? Duration.zero;
-                  var position = snapshot.data ?? Duration.zero;
-                  if (position > total) position = total;
-                  final maxMs = total.inMilliseconds.toDouble();
-                  return Row(
-                    children: [
-                      Text(
-                        _formatDuration(position),
-                        style: GoogleFonts.cairo(
-                          fontSize: 10,
-                          color: isDark
-                              ? TaybahColors.darkTextMuted
-                              : TaybahColors.textMuted,
-                        ),
-                      ),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            trackHeight: 3,
-                            thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 6,
-                            ),
-                            overlayShape: const RoundSliderOverlayShape(
-                              overlayRadius: 14,
-                            ),
-                          ),
-                          child: Slider(
-                            min: 0,
-                            max: maxMs > 0 ? maxMs : 1.0,
-                            value: maxMs > 0
-                                ? position.inMilliseconds
-                                    .toDouble()
-                                    .clamp(0.0, maxMs)
-                                    .toDouble()
-                                : 0.0,
-                            activeColor: TaybahColors.gold,
-                            inactiveColor: isDark
-                                ? TaybahColors.darkBorder
-                                : TaybahColors.primaryLight,
-                            onChanged: maxMs > 0
-                                ? (v) => _audioPlayer
-                                    .seek(Duration(milliseconds: v.round()))
-                                : null,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        _formatDuration(total),
-                        style: GoogleFonts.cairo(
-                          fontSize: 10,
-                          color: isDark
-                              ? TaybahColors.darkTextMuted
-                              : TaybahColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: _showReciterPicker,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 6,
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.record_voice_over_rounded,
-                              size: 18,
-                              color: TaybahColors.gold,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _reciter.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? TaybahColors.darkTextPrimary
-                                      : TaybahColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              Icons.expand_more_rounded,
-                              size: 18,
-                              color: isDark
-                                  ? TaybahColors.darkTextMuted
-                                  : TaybahColors.textMuted,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'رجوع 10 ثوانٍ',
-                    icon: const Icon(Icons.replay_10_rounded),
-                    onPressed: () {
-                      final target =
-                          _audioPlayer.position - const Duration(seconds: 10);
-                      _audioPlayer.seek(
-                        target < Duration.zero ? Duration.zero : target,
-                      );
-                    },
-                  ),
-                  IconButton(
-                    tooltip: _isPlaying ? 'إيقاف مؤقت' : 'تشغيل',
-                    iconSize: 40,
-                    icon: Icon(
-                      _isPlaying
-                          ? Icons.pause_circle_filled_rounded
-                          : Icons.play_circle_filled_rounded,
-                      color: isDark
-                          ? TaybahColors.goldLight
-                          : TaybahColors.primary,
-                    ),
-                    onPressed: _toggleAudio,
-                  ),
-                  IconButton(
-                    tooltip: 'تقديم 10 ثوانٍ',
-                    icon: const Icon(Icons.forward_10_rounded),
-                    onPressed: () {
-                      final total = _audioPlayer.duration;
-                      var target =
-                          _audioPlayer.position + const Duration(seconds: 10);
-                      if (total != null && target > total) target = total;
-                      _audioPlayer.seek(target);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   void _showFontSizeDialog() {
@@ -417,7 +104,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           return Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: isDark ? TaybahColors.darkSurface : Colors.white,
+              color: TaybahColors.surface,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
@@ -504,7 +191,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
         0;
 
     return Scaffold(
-      bottomNavigationBar: _audioReady ? _buildAudioBar() : null,
+      bottomNavigationBar: const QuranAudioBar(),
       appBar: AppBar(
         title: Column(
           children: [
@@ -541,32 +228,44 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
             tooltip: 'تغيير حجم الخط',
             onPressed: _showFontSizeDialog,
           ),
-          IconButton(
-            icon: _isLoadingAudio
-                ? const SizedBox(
+          AnimatedBuilder(
+            animation: QuranPlayer.instance,
+            builder: (context, _) {
+              final player = QuranPlayer.instance;
+              final isThis = player.isActive &&
+                  player.surahId == (widget.surahMeta['id'] as num).toInt();
+              if (isThis && player.isBuffering) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: TaybahColors.primary,
+                      color: TaybahColors.gold,
                       strokeWidth: 2,
                     ),
-                  )
-                : Icon(
-                    _isPlaying
-                        ? Icons.pause_circle_filled_rounded
-                        : Icons.play_circle_filled_rounded,
-                    size: 28,
-                    color: TaybahColors.gold,
                   ),
-            tooltip: 'تلاوة السورة (${_reciter.name} - قالون)',
-            onPressed: _toggleAudio,
+                );
+              }
+              return IconButton(
+                icon: Icon(
+                  isThis && player.isPlaying
+                      ? Icons.pause_circle_filled_rounded
+                      : Icons.play_circle_filled_rounded,
+                  size: 30,
+                  color: TaybahColors.gold,
+                ),
+                tooltip: 'استماع للسورة بصوت ${player.reciter.name}',
+                onPressed: _toggleAudio,
+              );
+            },
           ),
 
           const SizedBox(width: 4),
         ],
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: TaybahColors.primary),
             )
           : _isMushafMode
@@ -590,7 +289,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark ? TaybahColors.darkBorder : TaybahColors.border,
@@ -741,7 +440,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
           decoration: BoxDecoration(
             color: isTarget
                 ? (isDark ? const Color(0xFF1E3F28) : TaybahColors.primaryTint)
-                : (isDark ? TaybahColors.darkSurface : Colors.white),
+                : (TaybahColors.surface),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isTarget
@@ -835,7 +534,7 @@ class _SurahReaderScreenState extends State<SurahReaderScreen> {
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? TaybahColors.darkSurface : Colors.white,
+          color: TaybahColors.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(

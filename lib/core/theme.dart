@@ -2,39 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TaybahColors {
-  // Deep Royal Islamic Forest Emerald Palette (Darker, more prestigious & majestic)
-  static const Color primary = Color(0xFF183D24); // Deep Royal Forest Green
-  static const Color primaryDark = Color(0xFF0C2314); // Midnight Forest Green
-  static const Color primaryMedium = Color(0xFF1E4D2E); // Rich Pine Green
-  static const Color primaryAccent = Color(0xFF2D6E42); // Vibrant Emerald Accent
-  static const Color primaryLight = Color(0xFFCDE4D4); // Soft Mint Sage Light
-  static const Color primaryTint = Color(0xFFEBF5EF); // Ultra soft Forest Tint
+  /// يحدده AppState عند تغيير الوضع الليلي؛ الألوان المحايدة بالأسفل تتبدل تلقائياً.
+  static bool isDark = false;
 
-  // Noble Imperial Gold Accents
-  static const Color gold = Color(0xFFD4AF37); // Radiant Imperial Gold
-  static const Color goldLight = Color(0xFFE9C86A); // Shimmering Gold
-  static const Color goldSoft = Color(0xFFFAF3DF); // Soft Warm Gold Tint
+  // ──── ألوان الهوية الثابتة (لا تتغير بين الوضعين) ────
+  static const Color forest = Color(0xFF183D24); // الأخضر الملكي
+  static const Color forestDeep = Color(0xFF0C2314); // أخضر منتصف الليل
+  static const Color primaryMedium = Color(0xFF1E4D2E);
+  static const Color primaryAccent = Color(0xFF2D6E42);
+  static const Color gold = Color(0xFFD4AF37);
+  static const Color goldLight = Color(0xFFE9C86A);
+  static const Color mint = Color(0xFF8FD3A8);
 
-  // Neutral Background & Surface
-  static const Color background = Color(0xFFF7FAF8); // Crisp Pearl Off-White
-  static const Color surface = Colors.white;
-  static const Color surfaceMuted = Color(0xFFEFF4F0);
-  static const Color border = Color(0xFFDFE8E1);
-  static const Color borderGlow = Color(0xFFB8D4C0);
+  // ──── ألوان متكيفة (فاتح / ليلي) ────
+  static Color get primary =>
+      isDark ? const Color(0xFF3E9B66) : const Color(0xFF183D24);
+  static Color get primaryDark =>
+      isDark ? const Color(0xFFA9DDBB) : const Color(0xFF0C2314);
+  static Color get primaryLight =>
+      isDark ? const Color(0xFF1F3B2A) : const Color(0xFFCDE4D4);
+  static Color get primaryTint =>
+      isDark ? const Color(0xFF14261C) : const Color(0xFFEBF5EF);
+  static Color get goldSoft =>
+      isDark ? const Color(0xFF2B2513) : const Color(0xFFFAF3DF);
 
-  // Typography
-  static const Color textPrimary = Color(0xFF0F1E14); // Deep Rich Dark
-  static const Color textSecondary = Color(0xFF384A3D);
-  static const Color textMuted = Color(0xFF6E8073);
+  static Color get background =>
+      isDark ? darkBg : const Color(0xFFF7FAF8);
+  static Color get surface => isDark ? darkSurface : Colors.white;
+  static Color get surfaceMuted =>
+      isDark ? darkSurfaceMuted : const Color(0xFFEFF4F0);
+  static Color get border => isDark ? darkBorder : const Color(0xFFDFE8E1);
+  static Color get borderGlow =>
+      isDark ? const Color(0xFF2F5A40) : const Color(0xFFB8D4C0);
 
-  // ──── Dark Theme Colors ────
-  static const Color darkBg = Color(0xFF0A1A10); // Deep midnight emerald
-  static const Color darkSurface = Color(0xFF12261A); // Dark forest card
-  static const Color darkSurfaceMuted = Color(0xFF1A3324); // Slightly lighter
-  static const Color darkBorder = Color(0xFF264D34); // Subtle emerald border
-  static const Color darkTextPrimary = Color(0xFFE8F0EA); // Bright text
-  static const Color darkTextSecondary = Color(0xFFB0C4B7);
-  static const Color darkTextMuted = Color(0xFF6E8A78);
+  static Color get textPrimary =>
+      isDark ? darkTextPrimary : const Color(0xFF0F1E14);
+  static Color get textSecondary =>
+      isDark ? darkTextSecondary : const Color(0xFF384A3D);
+  static Color get textMuted =>
+      isDark ? darkTextMuted : const Color(0xFF6E8073);
+
+  // ──── ألوان الوضع الليلي (ليل زمردي عميق) ────
+  static const Color darkBg = Color(0xFF07110C);
+  static const Color darkSurface = Color(0xFF0F1C15);
+  static const Color darkSurfaceMuted = Color(0xFF16261D);
+  static const Color darkBorder = Color(0xFF223A2C);
+  static const Color darkTextPrimary = Color(0xFFEAF2EC);
+  static const Color darkTextSecondary = Color(0xFFB9CBBF);
+  static const Color darkTextMuted = Color(0xFF7F978A);
 }
 
 class TaybahTheme {
@@ -46,7 +61,7 @@ class TaybahTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: TaybahColors.background,
       primaryColor: TaybahColors.primary,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: TaybahColors.primary,
         onPrimary: Colors.white,
         primaryContainer: TaybahColors.primaryLight,
@@ -108,7 +123,7 @@ class TaybahTheme {
           fontWeight: FontWeight.w600,
           color: TaybahColors.textPrimary,
         ),
-        iconTheme: const IconThemeData(
+        iconTheme: IconThemeData(
           color: TaybahColors.primary,
         ),
       ),
@@ -117,7 +132,7 @@ class TaybahTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: TaybahColors.border, width: 1),
+          side: BorderSide(color: TaybahColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -169,11 +184,11 @@ class TaybahTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: TaybahColors.border, width: 1),
+          borderSide: BorderSide(color: TaybahColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: TaybahColors.primary, width: 1.5),
+          borderSide: BorderSide(color: TaybahColors.primary, width: 1.5),
         ),
         hintStyle: GoogleFonts.cairo(
           fontSize: 14,
@@ -200,7 +215,7 @@ class TaybahTheme {
         surfaceTintColor: Colors.transparent,
       ),
       primaryColor: TaybahColors.primaryAccent,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: TaybahColors.primaryAccent,
         onPrimary: Colors.white,
         primaryContainer: TaybahColors.primaryMedium,

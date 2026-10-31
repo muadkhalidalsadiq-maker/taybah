@@ -5,9 +5,11 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
+import '../data/adhan_voices.dart';
 import '../data/notification_service.dart';
 import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
+import 'widgets/adhan_voice_picker.dart';
 import 'widgets/city_picker_sheet.dart';
 
 class PrayerScreen extends StatefulWidget {
@@ -83,14 +85,12 @@ class _PrayerScreenState extends State<PrayerScreen>
     final next =
         await NotificationService.instance.togglePrayerNotification(key);
     setState(() => _prayerAlerts[key] = next);
-    if (_timings.isNotEmpty) {
-      NotificationService.instance.scheduleDailyPrayers(_timings);
-    }
     if (!mounted) return;
+    final prayerName = NotificationService.prayerNames[key] ?? key;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          next ? 'تم تفعيل إشعار أذان صلاة $key بنجاح ✓' : 'تم كتم إشعار صلاة $key',
+          next ? 'تم تفعيل تنبيه $prayerName ✓' : 'تم إيقاف تنبيه $prayerName',
           style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
         ),
         backgroundColor: next ? TaybahColors.primary : TaybahColors.textSecondary,
@@ -124,7 +124,7 @@ class _PrayerScreenState extends State<PrayerScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'تم إرسال إشعار تجريبي وتشغيل أذان $prayerName الآن.',
+              'تم إرسال إشعار تجريبي لأذان $prayerName بالصوت المختار.',
               style: GoogleFonts.cairo(
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
@@ -177,6 +177,7 @@ class _PrayerScreenState extends State<PrayerScreen>
     final name = await SharedPrefsHelper.instance.getSelectedCityName();
     final slug = await SharedPrefsHelper.instance.getSelectedCitySlug();
     final summer = await SharedPrefsHelper.instance.isSummerTime();
+    if (!mounted) return;
     setState(() {
       _cityName = name;
       _citySlug = slug;
@@ -351,7 +352,7 @@ class _PrayerScreenState extends State<PrayerScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: TaybahColors.surface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: TaybahColors.border),
             ),
@@ -363,7 +364,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                     color: TaybahColors.primaryTint,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on_rounded,
                     color: TaybahColors.primary,
                     size: 20,
@@ -423,13 +424,15 @@ class _PrayerScreenState extends State<PrayerScreen>
           decoration: BoxDecoration(
             color: (nextPrayer['isBetweenAdhanAndIqama'] == true)
                 ? const Color(0xFF15803D)
-                : TaybahColors.primaryDark,
+                : (TaybahColors.isDark
+                    ? const Color(0xFF12301F)
+                    : TaybahColors.forestDeep),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
                 color: (nextPrayer['isBetweenAdhanAndIqama'] == true)
                     ? const Color(0xFF15803D).withAlpha(80)
-                    : TaybahColors.primaryDark.withAlpha(50),
+                    : TaybahColors.forestDeep.withAlpha(50),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -554,7 +557,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: TaybahColors.border),
             boxShadow: [
@@ -573,7 +576,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                   color: TaybahColors.primaryTint,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_active_rounded,
                   color: TaybahColors.primary,
                   size: 22,
@@ -585,18 +588,45 @@ class _PrayerScreenState extends State<PrayerScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'نظام الأذان والإشعارات الحي',
-                      style: GoogleFonts.cairo(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: TaybahColors.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'تنبيهات الأذان تعمل تلقائياً لكل صلاة',
+                      'صوت الأذان',
                       style: GoogleFonts.cairo(
                         fontSize: 11,
                         color: TaybahColors.textMuted,
+                      ),
+                    ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () async {
+                        await AdhanVoicePickerSheet.show(context);
+                        if (mounted) setState(() {});
+                      },
+                      child: FutureBuilder<AdhanVoice>(
+                        future: AdhanVoices.getSelected(),
+                        builder: (context, snap) => Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                snap.data?.name ?? '...',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: TaybahColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'تغيير',
+                              style: GoogleFonts.cairo(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: TaybahColors.gold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -643,7 +673,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         const SizedBox(height: 12),
 
         if (_isLoading)
-          const Center(
+          Center(
             child: Padding(
               padding: EdgeInsets.all(32),
               child: CircularProgressIndicator(color: TaybahColors.primary),
@@ -666,7 +696,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                 vertical: 14,
               ),
               decoration: BoxDecoration(
-                color: isNext ? TaybahColors.primaryTint : Colors.white,
+                color: isNext ? TaybahColors.primaryTint : TaybahColors.surface,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: isNext
@@ -801,7 +831,7 @@ class _PrayerScreenState extends State<PrayerScreen>
               height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white,
+                color: TaybahColors.surface,
                 border: Border.all(
                   color: isAligned ? Colors.green : TaybahColors.border,
                   width: isAligned ? 3 : 2,
@@ -927,7 +957,7 @@ class _PrayerScreenState extends State<PrayerScreen>
 
   Widget _buildNawafilTab() {
     if (_nawafil.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: TaybahColors.primary),
       );
     }
@@ -939,7 +969,7 @@ class _PrayerScreenState extends State<PrayerScreen>
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: TaybahColors.border),
           ),
@@ -997,7 +1027,7 @@ class _PrayerScreenState extends State<PrayerScreen>
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.auto_awesome,
                             size: 18,
                             color: TaybahColors.primary,

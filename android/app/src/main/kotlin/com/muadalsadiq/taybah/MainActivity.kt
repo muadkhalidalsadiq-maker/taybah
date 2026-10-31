@@ -1,5 +1,6 @@
 package com.muadalsadiq.taybah
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// AudioServiceActivity بدل FlutterActivity حتى تعمل التلاوة في الخلفية وعلى شاشة القفل
+class MainActivity : AudioServiceActivity()

@@ -224,30 +224,6 @@ class SharedPrefsHelper {
     await p.setString('adhan_sound', sound);
   }
 
-  // ──── Daily Tasbeeh Stats ────
-  Future<int> getDailyTasbeehCount(String dateStr) async {
-    final p = await prefs;
-    return p.getInt('tasbeeh_$dateStr') ?? 0;
-  }
-
-  Future<void> addDailyTasbeehCount(String dateStr, int count) async {
-    final p = await prefs;
-    final current = p.getInt('tasbeeh_$dateStr') ?? 0;
-    await p.setInt('tasbeeh_$dateStr', current + count);
-  }
-
-  Future<Map<String, int>> getWeeklyTasbeehStats() async {
-    final p = await prefs;
-    final now = DateTime.now();
-    final stats = <String, int>{};
-    for (int i = 6; i >= 0; i--) {
-      final d = now.subtract(Duration(days: i));
-      final key = '${d.year}_${d.month}_${d.day}';
-      stats[key] = p.getInt('tasbeeh_$key') ?? 0;
-    }
-    return stats;
-  }
-
   // ──── Khatmah Progress ────
   Future<int> getKhatmahSurahProgress() async {
     final p = await prefs;

@@ -68,7 +68,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: TaybahColors.primary),
             )
           : Column(
@@ -81,7 +81,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     onChanged: _filter,
                     decoration: InputDecoration(
                       hintText: 'ابحث في 135 باباً من أذكار حصن المسلم...',
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search_rounded,
                         color: TaybahColors.primary,
                       ),
@@ -135,7 +135,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       iconColor = TaybahColors.gold;
     } else if (categoryName.contains('المساء')) {
       icon = Icons.nights_stay_rounded;
-      iconColor = TaybahColors.primaryMedium;
+      iconColor = TaybahColors.isDark ? TaybahColors.mint : TaybahColors.primaryMedium;
     } else if (categoryName.contains('النوم')) {
       icon = Icons.bedtime_rounded;
       iconColor = const Color(0xFF6366F1);
@@ -155,7 +155,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: TaybahColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: TaybahColors.border),
       ),
@@ -209,7 +209,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: TaybahColors.textMuted,
                 size: 14,
@@ -267,7 +267,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
           // Progress Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            color: Colors.white,
+            color: TaybahColors.surface,
             child: Column(
               children: [
                 Row(
@@ -298,7 +298,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                     value: progress,
                     minHeight: 6,
                     backgroundColor: TaybahColors.surfaceMuted,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
+                    valueColor: AlwaysStoppedAnimation<Color>(
                       TaybahColors.primary,
                     ),
                   ),
@@ -321,7 +321,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
 
                 return Container(
                   decoration: BoxDecoration(
-                    color: done ? TaybahColors.surfaceMuted : Colors.white,
+                    color: done ? TaybahColors.surfaceMuted : TaybahColors.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: done
