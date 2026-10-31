@@ -41,10 +41,12 @@ void main() {
 
   test('ألوان الوضع الليلي تتبدل', () {
     TaybahColors.isDark = false;
-    final light = TaybahColors.background;
+    final lightText = TaybahColors.textPrimary;
+    final lightCard = TaybahColors.surface;
     TaybahColors.isDark = true;
-    expect(TaybahColors.background, isNot(light));
-    // الخلفية شفافة في الليلي لتظهر صورة المسجد النبوي خلفها
+    expect(TaybahColors.textPrimary, isNot(lightText));
+    expect(TaybahColors.surface, isNot(lightCard));
+    // الخلفية شفافة في الوضعين لتظهر صورة المسجد النبوي خلف الزجاج
     expect(TaybahColors.background, Colors.transparent);
     TaybahColors.isDark = false;
   });
