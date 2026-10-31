@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:taybah/core/theme.dart';
@@ -40,10 +41,13 @@ void main() {
 
   test('ألوان الوضع الليلي تتبدل', () {
     TaybahColors.isDark = false;
-    final light = TaybahColors.background;
+    final lightText = TaybahColors.textPrimary;
+    final lightCard = TaybahColors.surface;
     TaybahColors.isDark = true;
-    expect(TaybahColors.background, isNot(light));
-    expect(TaybahColors.background, TaybahColors.darkBg);
+    expect(TaybahColors.textPrimary, isNot(lightText));
+    expect(TaybahColors.surface, isNot(lightCard));
+    // الخلفية شفافة في الوضعين لتظهر صورة المسجد النبوي خلف الزجاج
+    expect(TaybahColors.background, Colors.transparent);
     TaybahColors.isDark = false;
   });
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -38,7 +39,7 @@ class _DuasScreenState extends State<DuasScreen> {
       appBar: AppBar(
         title: Text(
           'أدعية الأنبياء والمرسلين',
-          style: GoogleFonts.cairo(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: _isLoading
@@ -55,7 +56,7 @@ class _DuasScreenState extends State<DuasScreen> {
                 final text = dua['dua'] ?? '';
                 final surah = dua['surah'] ?? '';
 
-                return Container(
+                return GlassContainer(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: TaybahColors.surface,
@@ -91,7 +92,7 @@ class _DuasScreenState extends State<DuasScreen> {
                                 const SizedBox(width: 6),
                                 Text(
                                   'دعاء $prophet',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 13,
                                     color: TaybahColors.primaryDark,
                                     fontWeight: FontWeight.bold,
@@ -144,7 +145,7 @@ class _DuasScreenState extends State<DuasScreen> {
                           const SizedBox(width: 6),
                           Text(
                             surah,
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 12,
                               color: TaybahColors.gold,
                               fontWeight: FontWeight.bold,

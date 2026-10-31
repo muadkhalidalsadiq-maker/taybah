@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'glass.dart';
 import '../../core/theme.dart';
 import '../../data/asset_loader.dart';
 import '../../data/prayer_api.dart';
@@ -91,7 +91,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
         SnackBar(
           content: Text(
             'تم تحديد أقرب مدينة لموقعك: ${nearest['ar_name']}',
-            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold),
           ),
           backgroundColor: TaybahColors.primary,
         ),
@@ -116,7 +116,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
-        color: TaybahColors.surface,
+        color: TaybahColors.sheet,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -157,8 +157,8 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'اختر المدينة (مواقيت الأوائل)',
-                        style: GoogleFonts.cairo(
+                        'اختر المدينة',
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: TaybahColors.textPrimary,
@@ -166,7 +166,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                       ),
                       Text(
                         'المواقيت المعتمدة رسمياً لـ 63 مدينة ومنطقة في ليبيا',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           color: TaybahColors.textMuted,
                         ),
@@ -203,7 +203,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                   _isDetectingLocation
                       ? 'جاري تحديد المدينة الأقرب...'
                       : 'تحديد المدينة تلقائياً حسب موقعك (GPS)',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -223,7 +223,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
           // Summer / Winter time toggle
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            child: Container(
+            child: GlassContainer(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: BoxDecoration(
                 color: TaybahColors.surfaceMuted,
@@ -248,7 +248,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                         _isSummerTime
                             ? 'التوقيت الصيفي مفعّل'
                             : 'التوقيت الشتوي مفعّل',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: TaybahColors.textPrimary,
@@ -303,7 +303,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                     ? Center(
                         child: Text(
                           'لا توجد مدينة مطابقة للبحث',
-                          style: GoogleFonts.cairo(color: TaybahColors.textMuted),
+                          style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textMuted),
                         ),
                       )
                     : ListView.separated(
@@ -350,7 +350,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                             ),
                             title: Text(
                               arName,
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 15,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
@@ -362,7 +362,7 @@ class _CityPickerSheetState extends State<CityPickerSheet> {
                             ),
                             subtitle: Text(
                               city['en_name'] ?? '',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 12,
                                 color: TaybahColors.textMuted,
                               ),

@@ -17,6 +17,32 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A1B2C3D40000000100000001 /* adhan.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000200000002 /* adhan.mp3 */; };
+		4B380A8511E522157D8D99A0 /* adhan_afasy_asr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 04E65A0964165748FF3981D2 /* adhan_afasy_asr.caf */; };
+		43E2F40C22BF3BD1AABCD9B8 /* adhan_afasy_dhuhr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 2E8D400A61F463ADA9B994A2 /* adhan_afasy_dhuhr.caf */; };
+		77765956D8D36C35C1307CE0 /* adhan_afasy_fajr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 35655EFDAD1B6EF8B1AD8D50 /* adhan_afasy_fajr.caf */; };
+		1A4B9A621F7DF2E8A40EB046 /* adhan_afasy_isha.caf in Resources */ = {isa = PBXBuildFile; fileRef = 0C694F654F7DD8BD320351E9 /* adhan_afasy_isha.caf */; };
+		AD63FC1048D27AEBC5D9216E /* adhan_afasy_maghrib.caf in Resources */ = {isa = PBXBuildFile; fileRef = A2F29A433CD7169F9EE25373 /* adhan_afasy_maghrib.caf */; };
+		CC131F429D4F6C92E041D3A9 /* adhan_kazabri_asr.caf in Resources */ = {isa = PBXBuildFile; fileRef = DC0F52BB1B291A8A3DEF9F78 /* adhan_kazabri_asr.caf */; };
+		CDC8D37C5745F54A3A779BE8 /* adhan_kazabri_dhuhr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 13560514922CA5E58257F7A8 /* adhan_kazabri_dhuhr.caf */; };
+		8949EB228253E8758232B24F /* adhan_kazabri_fajr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 30E4B9AAC7C6EF0542FBFB99 /* adhan_kazabri_fajr.caf */; };
+		D278435B64C6A91BDCB707C6 /* adhan_kazabri_isha.caf in Resources */ = {isa = PBXBuildFile; fileRef = 8FF0AA72E2095A8B16894E88 /* adhan_kazabri_isha.caf */; };
+		D876B87A12EAE79696BEF8C0 /* adhan_kazabri_maghrib.caf in Resources */ = {isa = PBXBuildFile; fileRef = 50175B218223D2B615A37A23 /* adhan_kazabri_maghrib.caf */; };
+		39C811F9367CCC11595BEB85 /* adhan_qatami_asr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6C3738F132FD2FA8B92D3C99 /* adhan_qatami_asr.caf */; };
+		A1D92BF65A20F597391DC510 /* adhan_qatami_dhuhr.caf in Resources */ = {isa = PBXBuildFile; fileRef = E8BC662B01ABF9C0D66C4838 /* adhan_qatami_dhuhr.caf */; };
+		EE2E4696F39594D50220E2C8 /* adhan_qatami_fajr.caf in Resources */ = {isa = PBXBuildFile; fileRef = AFB184D9EE1FA43A2975B462 /* adhan_qatami_fajr.caf */; };
+		08560FB79C4750E9FF3AD2E4 /* adhan_qatami_isha.caf in Resources */ = {isa = PBXBuildFile; fileRef = 98EB8D946B6576A95548B93E /* adhan_qatami_isha.caf */; };
+		772A1796B34608522DF10C29 /* adhan_qatami_maghrib.caf in Resources */ = {isa = PBXBuildFile; fileRef = E7B365D46741848A8969ED94 /* adhan_qatami_maghrib.caf */; };
+		014C36C744FDCE826B230CBD /* adhan_zahrani_asr.caf in Resources */ = {isa = PBXBuildFile; fileRef = F05DA8EDEE9D9B71F2D9485C /* adhan_zahrani_asr.caf */; };
+		885D50A855F31327F813EA80 /* adhan_zahrani_dhuhr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 0675DED24B0CCDDC4CCB84B6 /* adhan_zahrani_dhuhr.caf */; };
+		F082E5ABA2A376CA3B9DECB9 /* adhan_zahrani_fajr.caf in Resources */ = {isa = PBXBuildFile; fileRef = E44A7CD1C0A1CFA32160B39E /* adhan_zahrani_fajr.caf */; };
+		B739D265CE9D01F6060C8B56 /* adhan_zahrani_isha.caf in Resources */ = {isa = PBXBuildFile; fileRef = B89E4F044FE773A5765DF4D4 /* adhan_zahrani_isha.caf */; };
+		50FD0F6572A9B6D8D5C66EE6 /* adhan_zahrani_maghrib.caf in Resources */ = {isa = PBXBuildFile; fileRef = E265F884E6DA1C26882D4FEB /* adhan_zahrani_maghrib.caf */; };
+		67802258E92BAFDF85DBAC41 /* announce_asr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 73B51990C75AA2F72F8ADCCA /* announce_asr.caf */; };
+		0A73CA59796AD252F7426F23 /* announce_dhuhr.caf in Resources */ = {isa = PBXBuildFile; fileRef = 7338EC562452C9D6616E988A /* announce_dhuhr.caf */; };
+		18A6458606D84CC586FD40C4 /* announce_fajr.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1472DF6D15EC2A74FF59AA6 /* announce_fajr.caf */; };
+		943878DB12C0C9B5BC79080F /* announce_isha.caf in Resources */ = {isa = PBXBuildFile; fileRef = 5E3BE0CA0D57C5CFA15513F1 /* announce_isha.caf */; };
+		DC898E46764B57EAE604FDBF /* announce_maghrib.caf in Resources */ = {isa = PBXBuildFile; fileRef = 6FA6DCC3520F8A8B19BA3749 /* announce_maghrib.caf */; };
+		C3B2FC3729A8D0EEAC14D7C2 /* announce_sunrise.caf in Resources */ = {isa = PBXBuildFile; fileRef = 986EFD8510B4DBE8EA927CAA /* announce_sunrise.caf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +87,32 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1B2C3D40000000200000002 /* adhan.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = adhan.mp3; sourceTree = "<group>"; };
+		04E65A0964165748FF3981D2 /* adhan_afasy_asr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_afasy_asr.caf; sourceTree = "<group>"; };
+		2E8D400A61F463ADA9B994A2 /* adhan_afasy_dhuhr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_afasy_dhuhr.caf; sourceTree = "<group>"; };
+		35655EFDAD1B6EF8B1AD8D50 /* adhan_afasy_fajr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_afasy_fajr.caf; sourceTree = "<group>"; };
+		0C694F654F7DD8BD320351E9 /* adhan_afasy_isha.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_afasy_isha.caf; sourceTree = "<group>"; };
+		A2F29A433CD7169F9EE25373 /* adhan_afasy_maghrib.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_afasy_maghrib.caf; sourceTree = "<group>"; };
+		DC0F52BB1B291A8A3DEF9F78 /* adhan_kazabri_asr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_kazabri_asr.caf; sourceTree = "<group>"; };
+		13560514922CA5E58257F7A8 /* adhan_kazabri_dhuhr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_kazabri_dhuhr.caf; sourceTree = "<group>"; };
+		30E4B9AAC7C6EF0542FBFB99 /* adhan_kazabri_fajr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_kazabri_fajr.caf; sourceTree = "<group>"; };
+		8FF0AA72E2095A8B16894E88 /* adhan_kazabri_isha.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_kazabri_isha.caf; sourceTree = "<group>"; };
+		50175B218223D2B615A37A23 /* adhan_kazabri_maghrib.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_kazabri_maghrib.caf; sourceTree = "<group>"; };
+		6C3738F132FD2FA8B92D3C99 /* adhan_qatami_asr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_qatami_asr.caf; sourceTree = "<group>"; };
+		E8BC662B01ABF9C0D66C4838 /* adhan_qatami_dhuhr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_qatami_dhuhr.caf; sourceTree = "<group>"; };
+		AFB184D9EE1FA43A2975B462 /* adhan_qatami_fajr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_qatami_fajr.caf; sourceTree = "<group>"; };
+		98EB8D946B6576A95548B93E /* adhan_qatami_isha.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_qatami_isha.caf; sourceTree = "<group>"; };
+		E7B365D46741848A8969ED94 /* adhan_qatami_maghrib.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_qatami_maghrib.caf; sourceTree = "<group>"; };
+		F05DA8EDEE9D9B71F2D9485C /* adhan_zahrani_asr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_zahrani_asr.caf; sourceTree = "<group>"; };
+		0675DED24B0CCDDC4CCB84B6 /* adhan_zahrani_dhuhr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_zahrani_dhuhr.caf; sourceTree = "<group>"; };
+		E44A7CD1C0A1CFA32160B39E /* adhan_zahrani_fajr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_zahrani_fajr.caf; sourceTree = "<group>"; };
+		B89E4F044FE773A5765DF4D4 /* adhan_zahrani_isha.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_zahrani_isha.caf; sourceTree = "<group>"; };
+		E265F884E6DA1C26882D4FEB /* adhan_zahrani_maghrib.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = adhan_zahrani_maghrib.caf; sourceTree = "<group>"; };
+		73B51990C75AA2F72F8ADCCA /* announce_asr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_asr.caf; sourceTree = "<group>"; };
+		7338EC562452C9D6616E988A /* announce_dhuhr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_dhuhr.caf; sourceTree = "<group>"; };
+		A1472DF6D15EC2A74FF59AA6 /* announce_fajr.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_fajr.caf; sourceTree = "<group>"; };
+		5E3BE0CA0D57C5CFA15513F1 /* announce_isha.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_isha.caf; sourceTree = "<group>"; };
+		6FA6DCC3520F8A8B19BA3749 /* announce_maghrib.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_maghrib.caf; sourceTree = "<group>"; };
+		986EFD8510B4DBE8EA927CAA /* announce_sunrise.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = announce_sunrise.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +171,7 @@
 			children = (
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
+				9921B74BD372B2218858724D /* Sounds */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
@@ -129,6 +182,39 @@
 				A1B2C3D40000000200000002 /* adhan.mp3 */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		9921B74BD372B2218858724D /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				04E65A0964165748FF3981D2 /* adhan_afasy_asr.caf */,
+				2E8D400A61F463ADA9B994A2 /* adhan_afasy_dhuhr.caf */,
+				35655EFDAD1B6EF8B1AD8D50 /* adhan_afasy_fajr.caf */,
+				0C694F654F7DD8BD320351E9 /* adhan_afasy_isha.caf */,
+				A2F29A433CD7169F9EE25373 /* adhan_afasy_maghrib.caf */,
+				DC0F52BB1B291A8A3DEF9F78 /* adhan_kazabri_asr.caf */,
+				13560514922CA5E58257F7A8 /* adhan_kazabri_dhuhr.caf */,
+				30E4B9AAC7C6EF0542FBFB99 /* adhan_kazabri_fajr.caf */,
+				8FF0AA72E2095A8B16894E88 /* adhan_kazabri_isha.caf */,
+				50175B218223D2B615A37A23 /* adhan_kazabri_maghrib.caf */,
+				6C3738F132FD2FA8B92D3C99 /* adhan_qatami_asr.caf */,
+				E8BC662B01ABF9C0D66C4838 /* adhan_qatami_dhuhr.caf */,
+				AFB184D9EE1FA43A2975B462 /* adhan_qatami_fajr.caf */,
+				98EB8D946B6576A95548B93E /* adhan_qatami_isha.caf */,
+				E7B365D46741848A8969ED94 /* adhan_qatami_maghrib.caf */,
+				F05DA8EDEE9D9B71F2D9485C /* adhan_zahrani_asr.caf */,
+				0675DED24B0CCDDC4CCB84B6 /* adhan_zahrani_dhuhr.caf */,
+				E44A7CD1C0A1CFA32160B39E /* adhan_zahrani_fajr.caf */,
+				B89E4F044FE773A5765DF4D4 /* adhan_zahrani_isha.caf */,
+				E265F884E6DA1C26882D4FEB /* adhan_zahrani_maghrib.caf */,
+				73B51990C75AA2F72F8ADCCA /* announce_asr.caf */,
+				7338EC562452C9D6616E988A /* announce_dhuhr.caf */,
+				A1472DF6D15EC2A74FF59AA6 /* announce_fajr.caf */,
+				5E3BE0CA0D57C5CFA15513F1 /* announce_isha.caf */,
+				6FA6DCC3520F8A8B19BA3749 /* announce_maghrib.caf */,
+				986EFD8510B4DBE8EA927CAA /* announce_sunrise.caf */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -231,6 +317,32 @@
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				4B380A8511E522157D8D99A0 /* adhan_afasy_asr.caf in Resources */,
+				43E2F40C22BF3BD1AABCD9B8 /* adhan_afasy_dhuhr.caf in Resources */,
+				77765956D8D36C35C1307CE0 /* adhan_afasy_fajr.caf in Resources */,
+				1A4B9A621F7DF2E8A40EB046 /* adhan_afasy_isha.caf in Resources */,
+				AD63FC1048D27AEBC5D9216E /* adhan_afasy_maghrib.caf in Resources */,
+				CC131F429D4F6C92E041D3A9 /* adhan_kazabri_asr.caf in Resources */,
+				CDC8D37C5745F54A3A779BE8 /* adhan_kazabri_dhuhr.caf in Resources */,
+				8949EB228253E8758232B24F /* adhan_kazabri_fajr.caf in Resources */,
+				D278435B64C6A91BDCB707C6 /* adhan_kazabri_isha.caf in Resources */,
+				D876B87A12EAE79696BEF8C0 /* adhan_kazabri_maghrib.caf in Resources */,
+				39C811F9367CCC11595BEB85 /* adhan_qatami_asr.caf in Resources */,
+				A1D92BF65A20F597391DC510 /* adhan_qatami_dhuhr.caf in Resources */,
+				EE2E4696F39594D50220E2C8 /* adhan_qatami_fajr.caf in Resources */,
+				08560FB79C4750E9FF3AD2E4 /* adhan_qatami_isha.caf in Resources */,
+				772A1796B34608522DF10C29 /* adhan_qatami_maghrib.caf in Resources */,
+				014C36C744FDCE826B230CBD /* adhan_zahrani_asr.caf in Resources */,
+				885D50A855F31327F813EA80 /* adhan_zahrani_dhuhr.caf in Resources */,
+				F082E5ABA2A376CA3B9DECB9 /* adhan_zahrani_fajr.caf in Resources */,
+				B739D265CE9D01F6060C8B56 /* adhan_zahrani_isha.caf in Resources */,
+				50FD0F6572A9B6D8D5C66EE6 /* adhan_zahrani_maghrib.caf in Resources */,
+				67802258E92BAFDF85DBAC41 /* announce_asr.caf in Resources */,
+				0A73CA59796AD252F7426F23 /* announce_dhuhr.caf in Resources */,
+				18A6458606D84CC586FD40C4 /* announce_fajr.caf in Resources */,
+				943878DB12C0C9B5BC79080F /* announce_isha.caf in Resources */,
+				DC898E46764B57EAE604FDBF /* announce_maghrib.caf in Resources */,
+				C3B2FC3729A8D0EEAC14D7C2 /* announce_sunrise.caf in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				A1B2C3D40000000100000001 /* adhan.mp3 in Resources */,
 			);

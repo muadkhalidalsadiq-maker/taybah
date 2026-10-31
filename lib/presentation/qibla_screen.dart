@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
 import '../data/prayer_api.dart';
@@ -273,7 +272,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                     const SizedBox(width: 6),
                                     Text(
                                       _isGpsActive ? 'موقعك الدقيق (GPS)' : _selectedCityName,
-                                      style: GoogleFonts.cairo(
+                                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -284,7 +283,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                 const SizedBox(height: 4),
                                 Text(
                                   'دائرة: ${_cityLat.toStringAsFixed(2)}° | خط: ${_cityLng.toStringAsFixed(2)}°',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 12,
                                     color: Colors.white70,
                                   ),
@@ -313,7 +312,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   const SizedBox(width: 4),
                                   Text(
                                     isAligned ? 'مواجه للقبلة' : '${heading.toStringAsFixed(0)}° بوصلة',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -376,11 +375,11 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                         const SizedBox(width: 8),
                         Text(
                           isAligned
-                              ? 'أنت باتجاه القبلة المشرفة تماماً ✓'
+                              ? 'أنت باتجاه القبلة المشرفة تماماً'
                               : (_hasCompass
                                   ? 'أدر الهاتف حتى يشير السهم الذهبي إلى الأعلى'
                                   : 'وجّه الهاتف بزاوية ${_qiblaAngle.toStringAsFixed(0)}° بالنسبة للشمال'),
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: isAligned
@@ -454,7 +453,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   top: 14,
                                   child: Text(
                                     'ش (N)',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.redAccent,
@@ -465,7 +464,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   bottom: 14,
                                   child: Text(
                                     'ج (S)',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white70 : Colors.black87,
@@ -476,7 +475,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   right: 14,
                                   child: Text(
                                     'ش (E)',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white70 : Colors.black87,
@@ -487,7 +486,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                                   left: 14,
                                   child: Text(
                                     'غ (W)',
-                                    style: GoogleFonts.cairo(
+                                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white70 : Colors.black87,
@@ -591,7 +590,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                             const SizedBox(width: 8),
                             Text(
                               'إرشادات لدقة اتجاه القبلة',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -604,7 +603,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                           '• ضع الهاتف بشكل أفقي مستوٍ في راحة يدك أو على طاولة مستوية.\n'
                           '• ابتعد عن الأجهزة الإلكترونية والمعادن لتجنب تشويش البوصلة.\n'
                           '• إذا كانت البوصلة غير دقيقة، حرّك الهاتف في الهواء على شكل رقم (8) لمعايرتها.',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 12,
                             color: isDark ? Colors.white60 : TaybahColors.textSecondary,
                             height: 1.6,
@@ -631,7 +630,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.cairo(
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -639,7 +638,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
         ),
         Text(
           subtitle,
-          style: GoogleFonts.cairo(
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
             fontSize: 11,
             color: Colors.white70,
           ),
@@ -667,7 +666,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
               height: MediaQuery.of(ctx).size.height * 0.75,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: TaybahColors.surface,
+                color: TaybahColors.sheet,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
@@ -683,7 +682,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                   const SizedBox(height: 16),
                   Text(
                     'اختر المدينة لحساب اتجاه القبلة',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -710,7 +709,7 @@ class _QiblaScreenState extends State<QiblaScreen> with SingleTickerProviderStat
                         return ListTile(
                           title: Text(
                             name,
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                               color: isSelected ? TaybahColors.gold : null,
                             ),

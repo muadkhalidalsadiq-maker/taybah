@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -64,7 +65,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       appBar: AppBar(
         title: Text(
           'حصن المسلم والأذكار (${_allCategories.length} باباً)',
-          style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: _isLoading
@@ -104,7 +105,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                       ? Center(
                           child: Text(
                             'لا توجد أذكار مطابقة للبحث',
-                            style: GoogleFonts.cairo(color: TaybahColors.textMuted),
+                            style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textMuted),
                           ),
                         )
                       : ListView.separated(
@@ -152,8 +153,10 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
       icon = Icons.restaurant_rounded;
       iconColor = const Color(0xFFF97316);
     }
+    // لون واحد من الهوية لكل الأيقونات بدل الألوان المتعددة
+    iconColor = TaybahColors.isDark ? TaybahColors.goldLight : TaybahColors.forest;
 
-    return Container(
+    return GlassContainer(
       decoration: BoxDecoration(
         color: TaybahColors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -192,7 +195,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                   children: [
                     Text(
                       categoryName,
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.textPrimary,
@@ -201,7 +204,7 @@ class _AdhkarScreenState extends State<AdhkarScreen> {
                     const SizedBox(height: 2),
                     Text(
                       '${items.length} أذكار مأثورة',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 11,
                         color: TaybahColors.textMuted,
                       ),
@@ -259,7 +262,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
       appBar: AppBar(
         title: Text(
           widget.categoryName,
-          style: GoogleFonts.cairo(fontSize: 17, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 17, fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -275,7 +278,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                   children: [
                     Text(
                       'الإنجاز: $_completedCount من ${widget.items.length}',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.primaryDark,
@@ -283,7 +286,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                     ),
                     Text(
                       '${(progress * 100).toInt()}%',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.primary,
@@ -364,7 +367,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                               ),
                               child: Text(
                                 description,
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 12,
                                   color: TaybahColors.primaryDark,
                                   height: 1.4,
@@ -377,7 +380,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                             const SizedBox(height: 6),
                             Text(
                               reference,
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 11,
                                 color: TaybahColors.gold,
                                 fontWeight: FontWeight.bold,
@@ -402,9 +405,9 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                                 ),
                                 child: Text(
                                   done
-                                      ? 'مكتمل ✓'
+                                      ? 'مكتمل'
                                       : 'المتبقي: ${_remainingCounts[i]}',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 12,
                                     color: done
                                         ? const Color(0xFF15803D)
@@ -433,7 +436,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                                     },
                                   ),
                                   if (!done)
-                                    Container(
+                                    GlassContainer(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 10,
                                         vertical: 4,
@@ -444,7 +447,7 @@ class _AdhkarDetailScreenState extends State<AdhkarDetailScreen> {
                                       ),
                                       child: Text(
                                         'المس للعد',
-                                        style: GoogleFonts.cairo(
+                                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                                           fontSize: 11,
                                           color: TaybahColors.textMuted,
                                         ),

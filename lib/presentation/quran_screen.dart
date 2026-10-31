@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 import '../data/asset_loader.dart';
+import '../data/quran_downloads.dart';
 import '../data/quran_player.dart';
 import '../data/shared_prefs_helper.dart';
 import 'surah_reader_screen.dart';
 import 'widgets/quran_audio_bar.dart';
+import 'widgets/quran_downloads_sheet.dart';
 import 'widgets/quran_mushaf_view.dart';
 
 class QuranScreen extends StatefulWidget {
@@ -151,10 +154,16 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'القرآن الكريم (رواية قالون)',
-          style: GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold),
+          'القرآن الكريم',
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
+          if (QuranDownloads.supported)
+            IconButton(
+              tooltip: 'الاستماع بدون إنترنت',
+              icon: const Icon(Icons.download_for_offline_rounded),
+              onPressed: () => QuranDownloadsSheet.show(context),
+            ),
           IconButton(
             tooltip: 'اختيار القارئ',
             icon: const Icon(Icons.record_voice_over_rounded),
@@ -167,8 +176,8 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
           indicatorWeight: 3,
           labelColor: isDark ? TaybahColors.goldLight : TaybahColors.primary,
           unselectedLabelColor: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
-          labelStyle: GoogleFonts.cairo(fontSize: 14, fontWeight: FontWeight.bold),
-          unselectedLabelStyle: GoogleFonts.cairo(fontSize: 14),
+          labelStyle: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 14, fontWeight: FontWeight.bold),
+          unselectedLabelStyle: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 14),
           labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: const [
             Tab(text: 'المصحف'),
@@ -277,7 +286,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         children: [
                           Text(
                             'متابعة القراءة في المصحف',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 12,
                               color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
                               fontWeight: FontWeight.bold,
@@ -305,7 +314,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         Expanded(
           child: _filteredSurahs.isEmpty
               ? Center(
-                  child: Text('لا توجد سورة مطابقة', style: GoogleFonts.cairo(color: Colors.grey)),
+                  child: Text('لا توجد سورة مطابقة', style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.grey)),
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -345,7 +354,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         child: Center(
                           child: Text(
                             '$id',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -363,7 +372,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                       ),
                       subtitle: Text(
                         '$typeAr • $versesCount آية • صـ $page',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                         ),
@@ -392,19 +401,62 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                               );
                             },
                           ),
-                          Text(
-                            'صـ $page',
-                            style: GoogleFonts.cairo(
-                              fontSize: 12,
-                              color: TaybahColors.gold,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          // تحميل السورة للاستماع بدون إنترنت
+                          AnimatedBuilder(
+                            animation: Listenable.merge([
+                              QuranDownloads.instance,
+                              QuranPlayer.instance,
+                            ]),
+                            builder: (context, _) {
+                              if (!QuranDownloads.supported) {
+                                return const SizedBox.shrink();
+                              }
+                              final dl = QuranDownloads.instance;
+                              final r = QuranPlayer.instance.reciter;
+                              final prog = dl.progressOf(r, id);
+                              if (dl.isDownloaded(r, id)) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  child: Icon(Icons.offline_pin_rounded,
+                                      size: 22, color: TaybahColors.primary),
+                                );
+                              }
+                              if (prog != null) {
+                                return SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: CircularProgressIndicator(
+                                      value: prog == 0 ? null : prog,
+                                      strokeWidth: 2.4,
+                                      color: TaybahColors.gold,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return IconButton(
+                                tooltip: 'تحميل سورة $name بصوت ${r.name}',
+                                visualDensity: VisualDensity.compact,
+                                icon: Icon(Icons.download_rounded,
+                                    size: 22, color: TaybahColors.textMuted),
+                                onPressed: () => dl.download(r, id),
+                              );
+                            },
                           ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 14,
-                            color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
+                          // قراءة السورة آية بآية
+                          IconButton(
+                            tooltip: 'قراءة السورة آية بآية',
+                            visualDensity: VisualDensity.compact,
+                            icon: Icon(Icons.format_list_numbered_rtl_rounded,
+                                size: 22, color: TaybahColors.textMuted),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    SurahReaderScreen(surahMeta: surah),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -427,7 +479,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
         final firstSurahName = surahsInJozz.isNotEmpty ? surahsInJozz.first['name'] : '';
         final startPage = surahsInJozz.isNotEmpty ? (surahsInJozz.first['start_page'] ?? 1) : 1;
 
-        return Container(
+        return GlassContainer(
           decoration: BoxDecoration(
             color: TaybahColors.surface,
             borderRadius: BorderRadius.circular(18),
@@ -445,7 +497,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
               child: Center(
                 child: Text(
                   '$jozzNumber',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontWeight: FontWeight.bold,
                     color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
                   ),
@@ -454,7 +506,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
             ),
             title: Text(
               'الجزء $jozzNumber',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -462,7 +514,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
             ),
             subtitle: Text(
               surahsInJozz.isNotEmpty ? 'يبدأ بـ: سورة $firstSurahName • صـ $startPage' : '',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                 fontSize: 12,
                 color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
               ),
@@ -515,7 +567,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                         : _verseSearchController.text.isNotEmpty
                             ? 'لا توجد آيات مطابقة للبحث'
                             : 'اكتب كلمتين على الأقل للبحث في نص الآيات',
-                style: GoogleFonts.cairo(
+                style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 12,
                   color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                 ),
@@ -542,7 +594,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
               return InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () => _openVerseResult(res),
-                child: Container(
+                child: GlassContainer(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: TaybahColors.surface,
@@ -566,7 +618,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                             ),
                             child: Text(
                               'سورة $sName • آية $vId • صـ $p',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -577,7 +629,7 @@ class _QuranScreenState extends State<QuranScreen> with SingleTickerProviderStat
                             children: [
                               Text(
                                 'انتقال لصفحة $p',
-                                style: GoogleFonts.cairo(fontSize: 11, color: TaybahColors.gold),
+                                style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 11, color: TaybahColors.gold),
                               ),
                               const SizedBox(width: 4),
                               const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: TaybahColors.gold),

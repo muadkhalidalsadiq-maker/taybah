@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show Color;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'adhan_voices.dart';
+import 'alert_settings.dart';
+import 'home_widget_service.dart';
 import 'prayer_api.dart';
 import 'quran_player.dart';
 import 'shared_prefs_helper.dart';
@@ -35,6 +39,8 @@ class NotificationService {
   static const String _channelVersion = 'v1';
   static const String sunriseChannelId = 'taybah_sunrise_v1';
   static const String remindersChannelId = 'taybah_reminders_v1';
+  static const String preAdhanChannelId = 'taybah_pre_adhan_v1';
+  static const String iqamaChannelId = 'taybah_iqama_v1';
   static const List<String> _legacyChannels = ['adhan_channel_v3'];
 
   static const String stopActionId = 'stop_adhan';
@@ -55,8 +61,22 @@ class NotificationService {
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
 
-  static String _channelId(AdhanVoice voice, String prayerKey) =>
-      '$_channelPrefix${voice.id}_${prayerKey.toLowerCase()}_$_channelVersion';
+  /// معرّف القناة يتضمن الصوت ونوع الصوت (إشعار عادي / منبّه يعمل في الوضع الصامت)
+  /// لأن أندرويد لا يسمح بتغيير صوت القناة بعد إنشائها.
+  static String _channelId(AdhanVoice voice, String prayerKey, bool alarm) =>
+      '$_channelPrefix${voice.id}_${prayerKey.toLowerCase()}${alarm ? '_alarm' : ''}_$_channelVersion';
+
+  bool _alarmStream = false;
+
+  /// منطقة ليبيا الزمنية: مواقيت التطبيق كلها بتوقيت ليبيا، فنجدول على أساسها
+  /// حتى يصل التنبيه في اللحظة الصحيحة حتى لو كان الهاتف بمنطقة زمنية أخرى.
+  static tz.Location get libya {
+    try {
+      return tz.getLocation('Africa/Tripoli');
+    } catch (_) {
+      return tz.local;
+    }
+  }
 
   /// Initialize local notification system and timezones
   Future<void> init() async {
@@ -94,6 +114,7 @@ class NotificationService {
         },
       );
 
+      _alarmStream = await AlertSettings.adhanInSilent();
       if (_isAndroid) {
         await _setupAndroidChannels(await AdhanVoices.getSelected());
       }
@@ -118,10 +139,13 @@ class NotificationService {
     final android = _android;
     if (android == null) return;
     try {
+      final alarm = _alarmStream;
       final wanted = <String>{
-        for (final p in AdhanVoices.adhanPrayers) _channelId(voice, p),
+        for (final p in AdhanVoices.adhanPrayers) _channelId(voice, p, alarm),
         sunriseChannelId,
         remindersChannelId,
+        preAdhanChannelId,
+        iqamaChannelId,
       };
 
       final existing = await android.getNotificationChannels() ?? [];
@@ -136,12 +160,15 @@ class NotificationService {
       for (final p in AdhanVoices.adhanPrayers) {
         await android.createNotificationChannel(
           AndroidNotificationChannel(
-            _channelId(voice, p),
+            _channelId(voice, p, alarm),
             'أذان ${prayerNames[p]} • ${voice.name}',
             description: 'تنبيه دخول وقت صلاة ${prayerNames[p]}',
             importance: Importance.max,
             playSound: true,
             enableVibration: true,
+            audioAttributesUsage: alarm
+                ? AudioAttributesUsage.alarm
+                : AudioAttributesUsage.notification,
             sound: RawResourceAndroidNotificationSound(
               AdhanVoices.rawName(voice, p),
             ),
@@ -157,6 +184,26 @@ class NotificationService {
           importance: Importance.high,
           playSound: true,
           sound: RawResourceAndroidNotificationSound('announce_sunrise'),
+        ),
+      );
+
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          preAdhanChannelId,
+          'تنبيه قبل الأذان',
+          description: 'تذكير قبل دخول وقت الصلاة بدقائق',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+
+      await android.createNotificationChannel(
+        const AndroidNotificationChannel(
+          iqamaChannelId,
+          'تنبيه الإقامة',
+          description: 'تذكير بموعد إقامة الصلاة',
+          importance: Importance.high,
+          playSound: true,
         ),
       );
 
@@ -181,6 +228,66 @@ class NotificationService {
       await _setupAndroidChannels(AdhanVoices.byId(voiceId));
     }
     await rescheduleAll();
+  }
+
+  /// تشغيل الأذان حتى والهاتف على الوضع الصامت (يستعمل صوت المنبه).
+  Future<void> setAdhanInSilent(bool value) async {
+    await AlertSettings.setAdhanInSilent(value);
+    _alarmStream = value;
+    if (_isAndroid) {
+      await _setupAndroidChannels(await AdhanVoices.getSelected());
+    }
+    await rescheduleAll();
+  }
+
+  // ──── فحص جاهزية التنبيهات ────
+
+  Future<bool> notificationsAllowed() async {
+    try {
+      if (_isAndroid) {
+        return await _android?.areNotificationsEnabled() ?? true;
+      }
+      if (_isApple) {
+        final status = await Permission.notification.status;
+        return status.isGranted || status.isProvisional;
+      }
+    } catch (_) {}
+    return true;
+  }
+
+  Future<bool> exactAlarmsAllowed() async {
+    if (!_isAndroid) return true;
+    try {
+      return await _android?.canScheduleExactNotifications() ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// هل التطبيق مستثنى من توفير البطارية (أندرويد فقط).
+  Future<bool> batteryUnrestricted() async {
+    if (!_isAndroid) return true;
+    try {
+      return await Permission.ignoreBatteryOptimizations.isGranted;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<void> requestBatteryUnrestricted() async {
+    if (!_isAndroid) return;
+    try {
+      await Permission.ignoreBatteryOptimizations.request();
+    } catch (e) {
+      debugPrint('Battery optimization request failed: $e');
+    }
+  }
+
+  Future<void> requestExactAlarms() async {
+    if (!_isAndroid) return;
+    try {
+      await _android?.requestExactAlarmsPermission();
+    } catch (_) {}
   }
 
   /// Request permissions on Android 13+ and iOS
@@ -279,8 +386,9 @@ class NotificationService {
 
   NotificationDetails _prayerDetails(AdhanVoice voice, String prayerKey) {
     final isSunrise = prayerKey == 'Sunrise';
-    final channelId =
-        isSunrise ? sunriseChannelId : _channelId(voice, prayerKey);
+    final channelId = isSunrise
+        ? sunriseChannelId
+        : _channelId(voice, prayerKey, _alarmStream);
     final androidDetails = AndroidNotificationDetails(
       channelId,
       isSunrise
@@ -295,6 +403,9 @@ class NotificationService {
       color: const Color(0xFF183D24),
       enableVibration: true,
       playSound: true,
+      audioAttributesUsage: !isSunrise && _alarmStream
+          ? AudioAttributesUsage.alarm
+          : AudioAttributesUsage.notification,
       sound: RawResourceAndroidNotificationSound(
         AdhanVoices.rawName(voice, prayerKey),
       ),
@@ -310,12 +421,36 @@ class NotificationService {
             ],
     );
 
-    const darwinDetails = DarwinNotificationDetails(
+    // iOS: مقطع أقصر من 30 ثانية (يبدأ بـ«حان الآن...») مضمّن في حزمة التطبيق
+    final darwinDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
+      sound: '${AdhanVoices.rawName(voice, prayerKey)}.caf',
+      interruptionLevel: InterruptionLevel.timeSensitive,
     );
 
+    return NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+      macOS: darwinDetails,
+    );
+  }
+
+  NotificationDetails _simpleDetails(String channelId, String channelName) {
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelName,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: 'ic_stat_taybah',
+      color: const Color(0xFF183D24),
+      styleInformation: const BigTextStyleInformation(''),
+    );
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentSound: true,
+    );
     return NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
@@ -369,7 +504,7 @@ class NotificationService {
   }
 
   String _prayerTitle(String key) => key == 'Sunrise'
-      ? '☀️ حان الآن وقت الشروق'
+      ? 'حان الآن وقت الشروق'
       : 'الله أكبر • حان الآن موعد أذان ${prayerNames[key]}';
 
   String _prayerBody(String key) => key == 'Sunrise'
@@ -382,7 +517,7 @@ class NotificationService {
   bool _isScheduling = false;
   Map<String, dynamic>? _pendingTimings;
 
-  /// يجدول تنبيهات الصلوات الخمس + الشروق لعدة أيام قادمة،
+  /// يجدول تنبيهات الصلوات الخمس + الشروق والتنبيهات المرافقة لعدة أيام قادمة،
   /// كل يوم بميقاته الصحيح.
   Future<void> scheduleDailyPrayers(Map<String, dynamic> timings) async {
     if (timings.isEmpty) return;
@@ -411,30 +546,44 @@ class NotificationService {
   /// يعيد جدولة كل التنبيهات من الإعدادات المحفوظة (بعد تغيير أي إعداد).
   Future<void> rescheduleAll() async {
     try {
-      final today = await PrayerApi.getTimingsForDate(DateTime.now());
+      final today = await PrayerApi.getTimingsForDate(_libyaToday());
       await scheduleDailyPrayers(today);
     } catch (e) {
       debugPrint('Error rescheduling: $e');
     }
   }
 
+  /// تاريخ اليوم بتوقيت ليبيا.
+  DateTime _libyaToday() {
+    final n = tz.TZDateTime.now(libya);
+    return DateTime(n.year, n.month, n.day);
+  }
+
+  static const List<String> _prayerOrder = [
+    'Fajr',
+    'Sunrise',
+    'Dhuhr',
+    'Asr',
+    'Maghrib',
+    'Isha',
+  ];
+
+  // نطاقات معرّفات الإشعارات (لا تتداخل)
+  static int _adhanId(int d, int p) => 1000 + d * 10 + p;
+  static int _preId(int d, int p) => 3000 + d * 10 + p;
+  static int _iqamaId(int d, int p) => 5000 + d * 10 + p;
+  static int _azkarId(int d, int k) => 7000 + d * 10 + k;
+
   Future<void> _scheduleDailyPrayersInternal(
     Map<String, dynamic> timings,
   ) async {
-    const prayerData = [
-      {'key': 'Fajr', 'id': 101},
-      {'key': 'Sunrise', 'id': 102},
-      {'key': 'Dhuhr', 'id': 103},
-      {'key': 'Asr', 'id': 104},
-      {'key': 'Maghrib', 'id': 105},
-      {'key': 'Isha', 'id': 106},
-    ];
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final now = tz.TZDateTime.now(libya);
+    final today = _libyaToday();
     final masterEnabled =
         await SharedPrefsHelper.instance.getNotificationsEnabled();
     final voice = await AdhanVoices.getSelected();
+    final preMinutes = await AlertSettings.preAdhanMinutes();
+    final iqamaOn = await AlertSettings.iqamaReminder();
 
     // مواقيت كل يوم من الأيام القادمة (اليوم = المواقيت المعروضة على الشاشة)
     final dayTimings = <Map<String, dynamic>>[];
@@ -452,42 +601,154 @@ class NotificationService {
       }
     }
 
-    for (var pIdx = 0; pIdx < prayerData.length; pIdx++) {
-      final key = prayerData[pIdx]['key'] as String;
-      final legacyId = prayerData[pIdx]['id'] as int;
+    // ودجت الشاشة الرئيسية: مواقيت اليوم والغد
+    unawaited(HomeWidgetService.update(
+      today: dayTimings[0],
+      tomorrow: dayTimings.length > 1 ? dayTimings[1] : dayTimings[0],
+    ));
+
+    for (var pIdx = 0; pIdx < _prayerOrder.length; pIdx++) {
+      final key = _prayerOrder[pIdx];
+      final legacyId = 101 + pIdx;
+      final isSunrise = key == 'Sunrise';
 
       // إلغاء كل ما سبق جدولته لهذه الصلاة
       await _safeCancel(legacyId);
       for (var d = 0; d <= _scheduleDays; d++) {
-        await _safeCancel(1000 + d * 10 + pIdx);
+        await _safeCancel(_adhanId(d, pIdx));
+        await _safeCancel(_preId(d, pIdx));
+        await _safeCancel(_iqamaId(d, pIdx));
       }
 
       if (!masterEnabled) continue;
-      if (!await isPrayerNotificationEnabled(key)) continue;
+      final adhanOn = await isPrayerNotificationEnabled(key);
 
       for (var d = 0; d <= _scheduleDays; d++) {
         final when =
-            _dateTimeFor(today.add(Duration(days: d)), dayTimings[d][key]);
-        if (when == null || !when.isAfter(now)) continue;
+            _timeFor(today.add(Duration(days: d)), dayTimings[d][key]);
+        if (when == null) continue;
+        final name = prayerNames[key]!;
 
-        final isFallbackDay = d == _scheduleDays;
-        // اليوم الأخير: تنبيه يومي متكرر احتياطي إذا لم يُفتح التطبيق لمدة طويلة
-        // (على iOS المتكرر يبدأ من اليوم فيتكرر التنبيه، لذلك نتركه لأندرويد فقط)
-        if (isFallbackDay && _isApple) continue;
+        // 1) الأذان نفسه
+        if (adhanOn && when.isAfter(now)) {
+          final isFallbackDay = d == _scheduleDays;
+          // اليوم الأخير: تنبيه يومي متكرر احتياطي إذا لم يُفتح التطبيق لمدة طويلة
+          // (على iOS المتكرر يبدأ من اليوم فيتكرر التنبيه، لذلك نتركه لأندرويد فقط)
+          if (!(isFallbackDay && _isApple)) {
+            await _scheduleOne(
+              id: isFallbackDay ? legacyId : _adhanId(d, pIdx),
+              title: _prayerTitle(key),
+              body: _prayerBody(key),
+              when: when,
+              details: _prayerDetails(voice, key),
+              payload: 'prayer_$key',
+              repeatDaily: isFallbackDay,
+            );
+          }
+        }
 
-        await _scheduleOne(
-          id: isFallbackDay ? legacyId : 1000 + d * 10 + pIdx,
-          title: _prayerTitle(key),
-          body: _prayerBody(key),
-          when: when,
-          details: _prayerDetails(voice, key),
-          payload: 'prayer_$key',
-          repeatDaily: isFallbackDay,
-        );
+        if (isSunrise || d == _scheduleDays) continue;
+
+        // 2) تنبيه قبل الأذان
+        if (preMinutes > 0) {
+          final pre = when.subtract(Duration(minutes: preMinutes));
+          if (pre.isAfter(now)) {
+            await _scheduleOne(
+              id: _preId(d, pIdx),
+              title: 'بقي $preMinutes دقيقة على أذان $name',
+              body: 'استعد للصلاة وتوضأ • ﴿إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا﴾',
+              when: pre,
+              details: _simpleDetails(preAdhanChannelId, 'تنبيه قبل الأذان'),
+              payload: 'pre_$key',
+            );
+          }
+        }
+
+        // 3) تنبيه الإقامة
+        if (iqamaOn) {
+          final offset = PrayerApi.defaultIqamaOffsets[key] ?? 15;
+          final iqama = when.add(Duration(minutes: offset));
+          if (iqama.isAfter(now)) {
+            await _scheduleOne(
+              id: _iqamaId(d, pIdx),
+              title: 'حان موعد إقامة صلاة $name',
+              body: 'قد قامت الصلاة • أقيموا صفوفكم',
+              when: iqama,
+              details: _simpleDetails(iqamaChannelId, 'تنبيه الإقامة'),
+              payload: 'iqama_$key',
+            );
+          }
+        }
       }
     }
 
-    await scheduleDailyAzkarReminders();
+    await _scheduleAzkar(dayTimings, now, today, masterEnabled);
+  }
+
+  /// يُبقى للتوافق مع الشاشات: يعيد جدولة كل شيء بما فيه الأذكار.
+  Future<void> scheduleDailyAzkarReminders() => rescheduleAll();
+
+  /// أذكار الصباح بعد الفجر، والمساء بعد العصر، والنوم بعد العشاء —
+  /// كل يوم حسب مواقيت مدينة المستخدم.
+  Future<void> _scheduleAzkar(
+    List<Map<String, dynamic>> dayTimings,
+    tz.TZDateTime now,
+    DateTime today,
+    bool master,
+  ) async {
+    final prefs = SharedPrefsHelper.instance;
+    final items = [
+      (
+        await prefs.isMorningAdhkarReminderEnabled(),
+        'Fajr',
+        30,
+        'أذكار الصباح',
+        'ابدأ يومك بذكر الله وطمأنينة القلب',
+        'adhkar_morning',
+      ),
+      (
+        await prefs.isEveningAdhkarReminderEnabled(),
+        'Asr',
+        20,
+        'أذكار المساء',
+        '﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾',
+        'adhkar_evening',
+      ),
+      (
+        await prefs.isSleepAdhkarReminderEnabled(),
+        'Isha',
+        120,
+        'أذكار النوم وسورة الملك',
+        'اختم يومك بأذكار النوم وقراءة سورة الملك',
+        'adhkar_sleep',
+      ),
+    ];
+
+    // التذكيرات اليومية القديمة (من الإصدارات السابقة)
+    for (final id in const [201, 202, 203]) {
+      await _safeCancel(id);
+    }
+
+    for (var k = 0; k < items.length; k++) {
+      final (enabled, prayer, after, title, body, payload) = items[k];
+      for (var d = 0; d < _scheduleDays; d++) {
+        await _safeCancel(_azkarId(d, k));
+        if (!master || !enabled) continue;
+        final base = _timeFor(today.add(Duration(days: d)), dayTimings[d][prayer]);
+        if (base == null) continue;
+        final when = base.add(Duration(minutes: after));
+        if (!when.isAfter(now)) continue;
+        await _scheduleOne(
+          id: _azkarId(d, k),
+          title: title,
+          body: body,
+          when: when,
+          details: _reminderDetails(),
+          payload: payload,
+          exact: false,
+        );
+      }
+    }
   }
 
   Future<void> _safeCancel(int id) async {
@@ -496,14 +757,15 @@ class NotificationService {
     } catch (_) {}
   }
 
-  DateTime? _dateTimeFor(DateTime day, dynamic timeStr) {
+  /// يحوّل "HH:mm" (بتوقيت ليبيا) إلى لحظة زمنية دقيقة.
+  tz.TZDateTime? _timeFor(DateTime day, dynamic timeStr) {
     final s = timeStr?.toString() ?? '';
     if (!s.contains(':')) return null;
     final parts = s.split(':');
     final hour = int.tryParse(parts[0]);
     final minute = int.tryParse(parts[1]);
     if (hour == null || minute == null) return null;
-    return DateTime(day.year, day.month, day.day, hour, minute);
+    return tz.TZDateTime(libya, day.year, day.month, day.day, hour, minute);
   }
 
   /// يجدول تنبيهاً واحداً بالوقت الدقيق، وإذا رفض النظام المنبهات الدقيقة
@@ -512,22 +774,25 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
-    required DateTime when,
+    required tz.TZDateTime when,
     required NotificationDetails details,
     required String payload,
     bool repeatDaily = false,
+    bool exact = true,
   }) async {
-    final tzScheduled = tz.TZDateTime.from(when, tz.local);
-    for (final mode in const [
-      AndroidScheduleMode.exactAllowWhileIdle,
-      AndroidScheduleMode.inexactAllowWhileIdle,
-    ]) {
+    final modes = exact
+        ? const [
+            AndroidScheduleMode.exactAllowWhileIdle,
+            AndroidScheduleMode.inexactAllowWhileIdle,
+          ]
+        : const [AndroidScheduleMode.inexactAllowWhileIdle];
+    for (final mode in modes) {
       try {
         await _notificationsPlugin.zonedSchedule(
           id,
           title,
           body,
-          tzScheduled,
+          when,
           details,
           androidScheduleMode: mode,
           uiLocalNotificationDateInterpretation:
@@ -539,78 +804,6 @@ class NotificationService {
         return;
       } catch (e) {
         debugPrint('Error scheduling notification $id ($mode): $e');
-      }
-    }
-  }
-
-  /// تذكير أذكار الصباح والمساء والنوم (حسب اختيار المستخدم في الإعدادات).
-  Future<void> scheduleDailyAzkarReminders() async {
-    await init();
-    final now = DateTime.now();
-    final prefs = SharedPrefsHelper.instance;
-    final master = await prefs.getNotificationsEnabled();
-
-    final azkarSchedule = [
-      {
-        'id': 201,
-        'enabled': await prefs.isMorningAdhkarReminderEnabled(),
-        'title': '☀️ أذكار الصباح',
-        'body': 'ابدأ يومك بذكر الله وطمأنينة القلب',
-        'hour': 7,
-        'minute': 0,
-        'payload': 'adhkar_morning',
-      },
-      {
-        'id': 202,
-        'enabled': await prefs.isEveningAdhkarReminderEnabled(),
-        'title': '🌙 أذكار المساء',
-        'body': '﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾',
-        'hour': 16,
-        'minute': 45,
-        'payload': 'adhkar_evening',
-      },
-      {
-        'id': 203,
-        'enabled': await prefs.isSleepAdhkarReminderEnabled(),
-        'title': '✨ أذكار النوم وسورة الملك',
-        'body': 'اختم يومك بأذكار النوم وقراءة سورة الملك',
-        'hour': 22,
-        'minute': 30,
-        'payload': 'adhkar_sleep',
-      },
-    ];
-
-    for (final az in azkarSchedule) {
-      final id = az['id'] as int;
-      await _safeCancel(id);
-      if (!master || az['enabled'] != true) continue;
-
-      var scheduledDate = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        az['hour'] as int,
-        az['minute'] as int,
-      );
-      if (scheduledDate.isBefore(now)) {
-        scheduledDate = scheduledDate.add(const Duration(days: 1));
-      }
-
-      try {
-        await _notificationsPlugin.zonedSchedule(
-          id,
-          az['title'] as String,
-          az['body'] as String,
-          tz.TZDateTime.from(scheduledDate, tz.local),
-          _reminderDetails(),
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.time,
-          payload: az['payload'] as String,
-        );
-      } catch (e) {
-        debugPrint('Error scheduling Azkar reminder $id: $e');
       }
     }
   }

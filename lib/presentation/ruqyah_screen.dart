@@ -78,7 +78,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('تمت إعادة ضبط جميع عدادات التكرار', style: GoogleFonts.cairo()),
+                  content: Text('تمت إعادة ضبط جميع عدادات التكرار', style: const TextStyle(fontFamily: TaybahFonts.ui)),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -130,7 +130,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                               children: [
                                 Text(
                                   'تحصين وشفاء بإذن الله',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: TaybahColors.goldLight,
@@ -139,7 +139,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   'آيات وأدعية الرقية المأثورة عن النبي ﷺ للحفظ والشفاء',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 12,
                                     color: Colors.white70,
                                   ),
@@ -157,8 +157,8 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '💡 اضغط على البطاقة لتسجيل القراءة وإنقاص العداد تلقائياً',
-                          style: GoogleFonts.cairo(fontSize: 12, color: Colors.white),
+                          'اضغط على البطاقة لتسجيل القراءة وإنقاص العداد تلقائياً',
+                          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 12, color: Colors.white),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -199,7 +199,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
           const SizedBox(width: 10),
           Text(
             title,
-            style: GoogleFonts.cairo(
+            style: TextStyle(fontFamily: TaybahFonts.ui, 
               fontSize: 17,
               fontWeight: FontWeight.bold,
               color: isDark ? TaybahColors.goldLight : TaybahColors.primary,
@@ -272,7 +272,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                         Clipboard.setData(ClipboardData(text: '${item['text']}\n[${item['ref']}]'));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('تم النسخ للحافظة', style: GoogleFonts.cairo()),
+                            content: Text('تم النسخ للحافظة', style: const TextStyle(fontFamily: TaybahFonts.ui)),
                             duration: const Duration(seconds: 1),
                           ),
                         );
@@ -280,7 +280,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                     ),
                     Text(
                       item['ref'] ?? '',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 12,
                         color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                       ),
@@ -310,7 +310,7 @@ class _RuqyahScreenState extends State<RuqyahScreen> {
                       const SizedBox(width: 6),
                       Text(
                         isDone ? 'تم التكرار' : 'المتبقي: $remaining / $repeat',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: isDone ? Colors.white : TaybahColors.primaryDark,

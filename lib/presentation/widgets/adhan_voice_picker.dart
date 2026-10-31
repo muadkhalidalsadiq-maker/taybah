@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../core/theme.dart';
 import '../../data/adhan_voices.dart';
@@ -89,7 +88,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: BoxDecoration(
-        color: TaybahColors.surface,
+        color: TaybahColors.sheet,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       padding: EdgeInsets.fromLTRB(18, 10, 18, 18 + bottom),
@@ -131,7 +130,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
                   children: [
                     Text(
                       'صوت الأذان',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.textPrimary,
@@ -139,7 +138,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
                     ),
                     Text(
                       'يبدأ كل أذان بعبارة «حان الآن موعد أذان صلاة ...»',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 11.5,
                         color: TaybahColors.textMuted,
                       ),
@@ -162,7 +161,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
                     child: ChoiceChip(
                       label: Text(
                         NotificationService.prayerNames[p]!,
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: _previewPrayer == p
@@ -261,7 +260,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
                               children: [
                                 Text(
                                   voice.name,
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 14.5,
                                     fontWeight: FontWeight.bold,
                                     color: TaybahColors.textPrimary,
@@ -269,7 +268,7 @@ class _AdhanVoicePickerSheetState extends State<AdhanVoicePickerSheet> {
                                 ),
                                 Text(
                                   isPlaying ? 'يُشغَّل الآن…' : voice.subtitle,
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 11.5,
                                     color: isPlaying
                                         ? TaybahColors.gold

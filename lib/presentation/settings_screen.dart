@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/glass.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -9,8 +10,10 @@ import '../data/prayer_api.dart';
 import '../data/shared_prefs_helper.dart';
 import '../main.dart';
 import 'asma_allah_screen.dart';
+import 'privacy_screen.dart';
 import 'qibla_screen.dart';
 import 'ruqyah_screen.dart';
+import 'widgets/adhan_reliability_card.dart';
 import 'widgets/adhan_voice_picker.dart';
 import 'widgets/city_picker_sheet.dart';
 
@@ -143,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(
           content: Text(
             'تم تحديد أقرب مدينة بالـ GPS بنجاح: $_cityName',
-            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold),
           ),
           backgroundColor: TaybahColors.primary,
         ),
@@ -217,7 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Text(
               'تنبيه الأذان يعمل بنجاح!',
               style:
-                  GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.bold),
+                  TextStyle(fontFamily: TaybahFonts.ui, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -227,14 +230,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               'تم إرسال إشعار أذان تجريبي بصوت ${_adhanVoice.name}.',
-              style: GoogleFonts.cairo(
+              style: TextStyle(fontFamily: TaybahFonts.ui, 
                   fontSize: 14, color: TaybahColors.textPrimary),
             ),
             const SizedBox(height: 6),
             Text(
               'ستصلك تنبيهات الصلوات في موعد كل أذان بدقة بحسب مدينتك مع الصوت والاهتزاز.',
               style:
-                  GoogleFonts.cairo(fontSize: 12, color: TaybahColors.textMuted),
+                  TextStyle(fontFamily: TaybahFonts.ui, fontSize: 12, color: TaybahColors.textMuted),
             ),
           ],
         ),
@@ -245,7 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             child: Text(
               'إيقاف الأذان',
-              style: GoogleFonts.cairo(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: TaybahFonts.ui, color: Colors.redAccent, fontWeight: FontWeight.bold),
             ),
           ),
           ElevatedButton(
@@ -269,18 +272,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? TaybahColors.darkBg : TaybahColors.background,
+      backgroundColor: TaybahColors.background,
       appBar: AppBar(
         title: Text(
           'الإعدادات',
-          style: GoogleFonts.cairo(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 50),
         children: [
           // ──── Appearance & Dark Mode Section ────
-          _buildSectionHeader('المظهر والوضع الليلي', Icons.palette_rounded),
+          _buildSectionHeader('المظهر', Icons.palette_rounded),
           Consumer<AppState>(
             builder: (context, appState, child) {
               final mode = appState.themeMode;
@@ -315,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 4),
                           Text(
                             label,
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 12.5,
                               fontWeight: FontWeight.bold,
                               color: selected
@@ -330,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }
 
-              return Container(
+              return GlassContainer(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: TaybahColors.surface,
@@ -353,7 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // City & Location Section
-          _buildSectionHeader('المدينة والموقع الجغرافي', Icons.location_on_rounded),
+          _buildSectionHeader('المدينة والموقع', Icons.location_on_rounded),
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -377,14 +380,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Text(
                           'المدينة المعتمدة الحالية',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 11,
                             color: TaybahColors.textMuted,
                           ),
                         ),
                         Text(
                           'ليبيا - $_cityName',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: TaybahColors.primaryDark,
@@ -406,7 +409,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       child: Text(
                         'تغيير المدينة',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -433,7 +436,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _isGpsDetecting
                           ? 'جاري فحص الـ GPS...'
                           : 'تحديد المدينة الأقرب تلقائياً بالـ GPS',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 12.5,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.primary,
@@ -455,8 +458,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // Prayer Times & Timing Adjustments Section
-          _buildSectionHeader('ضبط وتعديل مواقيت الصلاة', Icons.access_time_filled_rounded),
-          Container(
+          _buildSectionHeader('ضبط المواقيت', Icons.access_time_filled_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -489,7 +492,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _isSummer
                                   ? 'التوقيت الصيفي'
                                   : 'التوقيت الشتوي',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: TaybahColors.textPrimary,
@@ -497,9 +500,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             Text(
                               _isSummer
-                                  ? 'إضافة ساعة واحدة للمواقيت (المعتمد حالياً)'
+                                  ? 'إضافة ساعة واحدة للمواقيت'
                                   : 'التوقيت الشتوي الأصلي',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 11,
                                 color: TaybahColors.textMuted,
                               ),
@@ -524,7 +527,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Text(
                       'تعديل يدوي بالدقائق (+/- دقيقة)',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.primaryDark,
@@ -534,7 +537,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onPressed: _resetOffsets,
                       child: Text(
                         'استعادة 0 دقيقة',
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 11,
                           color: TaybahColors.textMuted,
                         ),
@@ -556,7 +559,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Text(
                           name,
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: TaybahColors.textPrimary,
@@ -587,7 +590,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     : offset > 0
                                         ? '+$offset د'
                                         : '$offset د',
-                                style: GoogleFonts.cairo(
+                                style: TextStyle(fontFamily: TaybahFonts.ui, 
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: offset == 0
@@ -615,8 +618,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // ──── Hijri Calendar Adjustment Section ────
-          _buildSectionHeader('التقويم الهجري وتعديل الأيام', Icons.calendar_month_rounded),
-          Container(
+          _buildSectionHeader('التاريخ الهجري', Icons.calendar_month_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -636,7 +639,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Text(
                           'تعديل التاريخ الهجري',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -644,7 +647,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         Text(
                           'لمطابقة رؤية الهلال الرسمية في ليبيا',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 11,
                             color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                           ),
@@ -662,7 +665,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _hijriAdjustment == 0
                             ? 'بدون تعديل'
                             : (_hijriAdjustment > 0 ? '+$_hijriAdjustment يوم' : '$_hijriAdjustment يوم'),
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: TaybahColors.gold,
@@ -679,7 +682,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     return ChoiceChip(
                       label: Text(
                         adj == 0 ? '0' : (adj > 0 ? '+$adj' : '$adj'),
-                        style: GoogleFonts.cairo(
+                        style: TextStyle(fontFamily: TaybahFonts.ui, 
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           color: isSelected
                               ? Colors.white
@@ -701,9 +704,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 22),
 
+          // Adhan reliability
+          _buildSectionHeader('موثوقية الأذان', Icons.verified_user_rounded),
+          const AdhanReliabilityCard(),
+
+          const SizedBox(height: 22),
+
           // Adhan & Notifications Section
-          _buildSectionHeader('الأذان والتنبيهات الإيمانية', Icons.notifications_active_rounded),
-          Container(
+          _buildSectionHeader('الأذان والتنبيهات', Icons.notifications_active_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -728,7 +737,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             Text(
                               'تفعيل تنبيهات الأذان',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -736,7 +745,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             Text(
                               'إشعار حي عند دخول وقت الصلاة',
-                              style: GoogleFonts.cairo(
+                              style: TextStyle(fontFamily: TaybahFonts.ui, 
                                 fontSize: 11,
                                 color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                               ),
@@ -795,14 +804,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               children: [
                                 Text(
                                   'صوت الأذان',
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 11.5,
                                     color: TaybahColors.textMuted,
                                   ),
                                 ),
                                 Text(
                                   _adhanVoice.name,
-                                  style: GoogleFonts.cairo(
+                                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                                     fontSize: 14.5,
                                     fontWeight: FontWeight.bold,
                                     color: TaybahColors.textPrimary,
@@ -813,13 +822,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           Text(
                             'تغيير',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 12.5,
                               fontWeight: FontWeight.bold,
                               color: TaybahColors.gold,
                             ),
                           ),
-                          const Icon(Icons.chevron_left_rounded,
+                          const Icon(Icons.chevron_right_rounded,
                               color: TaybahColors.gold),
                         ],
                       ),
@@ -835,7 +844,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _testAdhan,
                     icon: const Icon(Icons.volume_up_rounded, size: 16),
-                    label: const Text('تجربة تنبيه الأذان الآن'),
+                    label: const Text('تجربة الأذان'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: TaybahColors.primary,
                       foregroundColor: Colors.white,
@@ -853,7 +862,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Per-prayer toggles
                 Text(
                   'تنبيهات الصلوات المنفردة:',
-                  style: GoogleFonts.cairo(
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: TaybahColors.textMuted,
@@ -871,7 +880,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     dense: true,
                     title: Text(
                       name,
-                      style: GoogleFonts.cairo(fontSize: 13),
+                      style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 13),
                     ),
                     value: enabled,
                     activeTrackColor: TaybahColors.primary,
@@ -886,8 +895,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار الصباح (عند الإشراق)',
-                    style: GoogleFonts.cairo(fontSize: 13),
+                    'تذكير أذكار الصباح (بعد الفجر بنصف ساعة)',
+                    style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 13),
                   ),
                   value: _isMorningReminder,
                   activeTrackColor: TaybahColors.primary,
@@ -903,8 +912,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار المساء (بعد العصر)',
-                    style: GoogleFonts.cairo(fontSize: 13),
+                    'تذكير أذكار المساء (بعد العصر بثلث ساعة)',
+                    style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 13),
                   ),
                   value: _isEveningReminder,
                   activeTrackColor: TaybahColors.primary,
@@ -920,8 +929,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                   title: Text(
-                    'تذكير أذكار النوم وسورة الملك',
-                    style: GoogleFonts.cairo(fontSize: 13),
+                    'تذكير أذكار النوم (بعد العشاء بساعتين)',
+                    style: TextStyle(fontFamily: TaybahFonts.ui, fontSize: 13),
                   ),
                   value: _isSleepReminder,
                   activeTrackColor: TaybahColors.primary,
@@ -940,8 +949,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // Quran Reading & Font Size Settings Section
-          _buildSectionHeader('قراءة وتلاوة القرآن الكريم', Icons.menu_book_rounded),
-          Container(
+          _buildSectionHeader('المصحف', Icons.menu_book_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -956,7 +965,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Text(
                       'حجم خط المصحف الشريف',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.textPrimary,
@@ -964,7 +973,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     Text(
                       '${_quranFontSize.toInt()} نقطة',
-                      style: GoogleFonts.cairo(
+                      style: TextStyle(fontFamily: TaybahFonts.ui, 
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: TaybahColors.primary,
@@ -1007,8 +1016,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // ──── Additional Islamic Services Section ────
-          _buildSectionHeader('خدمات وأقسام إيمانية مميزة', Icons.auto_awesome_rounded),
-          Container(
+          _buildSectionHeader('أقسام أخرى', Icons.auto_awesome_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -1030,7 +1039,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   title: Text(
                     'بوصلة القبلة الشريفة',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -1038,7 +1047,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   subtitle: Text(
                     'تحديد اتجاه الكعبة والمسافة الفلكية بالدرجات',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 11,
                       color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                     ),
@@ -1061,7 +1070,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   title: Text(
                     'أسماء الله الحسنى (99 اسماً)',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -1069,7 +1078,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   subtitle: Text(
                     '«مَنْ أَحْصَاهَا دَخَلَ الجَنَّةَ» مع الشرح والمعاني',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 11,
                       color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                     ),
@@ -1092,7 +1101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   title: Text(
                     'الرقية الشرعية',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: isDark ? TaybahColors.darkTextPrimary : TaybahColors.textPrimary,
@@ -1100,7 +1109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   subtitle: Text(
                     'آيات وأدعية الشفاء والتحصين مع عدادات التكرار',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 11,
                       color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                     ),
@@ -1118,8 +1127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 22),
 
           // About App & Credits Section
-          _buildSectionHeader('حول التطبيق والهوية', Icons.info_outline_rounded),
-          Container(
+          _buildSectionHeader('عن التطبيق', Icons.info_outline_rounded),
+          GlassContainer(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: TaybahColors.surface,
@@ -1132,7 +1141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
+                    GlassContainer(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
@@ -1149,8 +1158,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'تطبيق طيبة الإسلامي (V3)',
-                            style: GoogleFonts.cairo(
+                            'طيبة للأذكار والصلاة • الإصدار 3.0',
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: isDark ? TaybahColors.goldLight : TaybahColors.primaryDark,
@@ -1158,7 +1167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           Text(
                             'رواية قالون عن نافع • مواقيت الأوائل • بوصلة القبلة • أسماء الله',
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 11,
                               color: isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted,
                             ),
@@ -1172,8 +1181,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(height: 1),
                 const SizedBox(height: 10),
                 Text(
-                  'تطبيق إسلامي شامل صدقة جارية، يهدف لخدمة كتاب الله وسنة رسوله وتيسير العبادات اليومية في ليبيا والعالم الإسلامي.',
-                  style: GoogleFonts.cairo(
+                  'صدقة جارية. صورة المسجد النبوي في الوضع الليلي: Muhammad Mahdi Karim (micro2macro.net) — رخصة الفن الحر Free Art License.',
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
                     fontSize: 12,
                     color: isDark ? TaybahColors.darkTextSecondary : TaybahColors.textSecondary,
                     height: 1.5,
@@ -1183,6 +1192,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+          Material(
+            color: TaybahColors.surface,
+            borderRadius: BorderRadius.circular(18),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(color: TaybahColors.border),
+              ),
+              leading: Icon(Icons.privacy_tip_rounded, color: TaybahColors.primary),
+              title: Text('سياسة الخصوصية',
+                  style: TextStyle(fontFamily: TaybahFonts.ui, 
+                      fontWeight: FontWeight.bold,
+                      color: TaybahColors.textPrimary)),
+              trailing: Icon(Icons.chevron_right_rounded,
+                  color: TaybahColors.textMuted),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1190,21 +1221,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSectionHeader(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8, right: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 17, color: TaybahColors.primary),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: GoogleFonts.cairo(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: TaybahColors.primaryDark,
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.fromLTRB(6, 4, 6, 10),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontFamily: TaybahFonts.ui,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: TaybahColors.textMuted,
+        ),
       ),
     );
   }
+
 }

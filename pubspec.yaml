@@ -1,7 +1,7 @@
 name: taybah
 description: "طيبة للأذكار والصلاة - مواقيت الصلاة، الأذكار، والقرآن الكريم برواية قالون"
 publish_to: 'none'
-version: 2.9.0+3
+version: 3.0.0+5
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -28,6 +28,7 @@ dependencies:
   flutter_compass: ^0.8.1
   just_audio_background: ^0.0.1-beta.17
   hijri: ^3.0.1
+  home_widget: ^0.10.0
 
 dev_dependencies:
   flutter_test:
@@ -40,3 +41,19 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/audio/
+
+  fonts:
+    - family: Somar
+      fonts:
+        - asset: assets/fonts/SomarSans-Light.otf
+          weight: 300
+        - asset: assets/fonts/SomarSans-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SomarSans-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SomarSans-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/SomarSans-Bold.otf
+          weight: 700
+        - asset: assets/fonts/SomarSans-ExtraBold.otf
+          weight: 800

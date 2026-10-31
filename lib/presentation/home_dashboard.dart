@@ -21,6 +21,8 @@ import 'ruqyah_screen.dart';
 import 'settings_screen.dart';
 
 import 'widgets/city_picker_sheet.dart';
+import 'widgets/glass.dart';
+import 'widgets/ui_kit.dart';
 
 class TaybahDashboard extends StatefulWidget {
   const TaybahDashboard({super.key});
@@ -78,9 +80,9 @@ class TaybahDashboardState extends State<TaybahDashboard> {
 
           // Floating Glassmorphic Bottom Navigation Bar (Ultra-clean, calm & simple)
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 20,
+            left: 22,
+            right: 22,
+            bottom: 18 + MediaQuery.of(context).padding.bottom,
             child: _buildFloatingGlassBar(),
           ),
         ],
@@ -88,115 +90,108 @@ class TaybahDashboardState extends State<TaybahDashboard> {
     );
   }
 
+  /// الشريط السفلي بزجاج سائل: كبسولة للأقسام + دائرة منفصلة للقبلة.
   Widget _buildFloatingGlassBar() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final items = [
-      {
-        'label': 'الرئيسية',
-        'icon': Icons.home_rounded,
-        'unselected': Icons.home_outlined,
-      },
-      {
-        'label': 'القرآن',
-        'icon': Icons.menu_book_rounded,
-        'unselected': Icons.menu_book_outlined,
-      },
-      {
-        'label': 'الصلاة',
-        'icon': Icons.mosque_rounded,
-        'unselected': Icons.mosque_outlined,
-      },
-      {
-        'label': 'الأذكار',
-        'icon': Icons.auto_stories_rounded,
-        'unselected': Icons.auto_stories_outlined,
-      },
+    final dark = TaybahColors.isDark;
+    const items = [
+      ('الرئيسية', Icons.home_rounded, Icons.home_outlined),
+      ('القرآن', Icons.menu_book_rounded, Icons.menu_book_outlined),
+      ('الصلاة', Icons.access_time_filled_rounded, Icons.access_time_rounded),
+      ('الأذكار', Icons.auto_stories_rounded, Icons.auto_stories_outlined),
     ];
+    final active = dark ? TaybahColors.goldLight : TaybahColors.forest;
+    final idle = dark ? Colors.white.withAlpha(190) : const Color(0xFF26352B);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          decoration: BoxDecoration(
-            color: isDark ? TaybahColors.darkSurface.withAlpha(225) : Colors.white.withAlpha(225),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: isDark ? TaybahColors.darkBorder : Colors.white.withAlpha(240),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(isDark ? 50 : 14),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-              BoxShadow(
-                color: (isDark ? TaybahColors.gold : TaybahColors.primary).withAlpha(12),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (i) {
-              final isSelected = selectedIndex == i;
-              final item = items[i];
-
-              return Expanded(
-                child: InkWell(
-                  onTap: () => setTab(i),
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isSelected
-                            ? (item['icon'] as IconData)
-                            : (item['unselected'] as IconData),
-                        size: 19,
-                        color: isSelected
-                            ? (isDark ? TaybahColors.goldLight : TaybahColors.primary)
-                            : (isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item['label'] as String,
-                        style: GoogleFonts.cairo(
-                          fontSize: 10,
-                          fontWeight: isSelected
-                              ? FontWeight.w800
-                              : FontWeight.w500,
-                          color: isSelected
-                              ? (isDark ? TaybahColors.goldLight : TaybahColors.primary)
-                              : (isDark ? TaybahColors.darkTextMuted : TaybahColors.textMuted),
-                          height: 1.1,
+    return Row(
+      children: [
+        Expanded(
+          child: GlassContainer(
+            height: 62,
+            grouped: false,
+            blur: 18,
+            elevation: 1.2,
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(31)),
+            child: Row(
+              children: List.generate(items.length, (i) {
+                final selected = selectedIndex == i;
+                final (label, on, off) = items[i];
+                return Expanded(
+                  child: Tooltip(
+                    message: label,
+                    child: Semantics(
+                      label: label,
+                      selected: selected,
+                      button: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => setTab(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutCubic,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: selected
+                                ? (dark
+                                    ? Colors.white.withAlpha(30)
+                                    : Colors.white.withAlpha(185))
+                                : Colors.transparent,
+                            boxShadow: selected && !dark
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withAlpha(14),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                          child: Center(
+                            child: AnimatedScale(
+                              duration: const Duration(milliseconds: 220),
+                              scale: selected ? 1.08 : 1,
+                              child: Icon(
+                                selected ? on : off,
+                                size: 25,
+                                color: selected ? active : idle,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      // Subtle gold indicator dot
-                      Container(
-                        width: isSelected ? 10 : 0,
-                        height: 2.0,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? TaybahColors.gold
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ),
-      ),
+        const SizedBox(width: 14),
+        Tooltip(
+          message: 'اتجاه القبلة',
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const QiblaScreen()),
+              );
+            },
+            child: GlassContainer(
+              width: 62,
+              height: 62,
+              grouped: false,
+              blur: 18,
+              elevation: 1.2,
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              child: Center(
+                child: Icon(Icons.explore_outlined, size: 26, color: idle),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -214,7 +209,6 @@ class _HomeTabState extends State<HomeTab> {
   Map<String, dynamic> _timings = {};
   String _cityName = PrayerApi.defaultCityName;
   String _citySlug = PrayerApi.defaultCitySlug;
-  bool _isSummer = true;
   int _hijriAdjustment = 0;
   Map<String, dynamic>? _lastRead;
   Map<String, bool> _prayerTracker = {};
@@ -296,10 +290,6 @@ class _HomeTabState extends State<HomeTab> {
     return namesOfAllah[dayOfYear % namesOfAllah.length];
   }
 
-  String _getGreeting() {
-    return 'طوبى لمن طاب قلبه بذكر الله';
-  }
-
   String _getHijriDateApprox() {
     final d = DateTime.now().add(Duration(days: _hijriAdjustment));
     try {
@@ -364,7 +354,7 @@ class _HomeTabState extends State<HomeTab> {
           SnackBar(
             content: Text(
               'أهلاً بك! تم تحديد مدينتك تلقائياً بالـ GPS: ${detected['ar_name']}',
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+              style: TextStyle(fontFamily: TaybahFonts.ui, fontWeight: FontWeight.bold),
             ),
             backgroundColor: TaybahColors.primary,
           ),
@@ -377,6 +367,47 @@ class _HomeTabState extends State<HomeTab> {
     // طلب إذن الإشعارات (أندرويد 13+ و iOS) حتى يصل الأذان فعلاً
     await NotificationService.instance.requestPermissions(askExactAlarm: isFirst);
     NotificationService.instance.rescheduleAll();
+    if (isFirst) await _askBatteryExemption();
+  }
+
+  /// شرح بسيط ثم طلب استثناء التطبيق من توفير البطارية (أندرويد) حتى لا يتأخر الأذان.
+  Future<void> _askBatteryExemption() async {
+    final svc = NotificationService.instance;
+    if (await svc.batteryUnrestricted() || !mounted) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: TaybahColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        icon: const Icon(Icons.battery_alert_rounded,
+            color: TaybahColors.gold, size: 36),
+        title: Text(
+          'حتى يصلك الأذان في وقته',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
+              fontWeight: FontWeight.bold, color: TaybahColors.textPrimary),
+        ),
+        content: Text(
+          'بعض الهواتف توقف التنبيهات لتوفير البطارية فيتأخر الأذان أو لا يصل. '
+          'اسمح لتطبيق طيبة بالعمل بدون قيود البطارية.',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontFamily: TaybahFonts.ui, 
+              fontSize: 13.5, color: TaybahColors.textSecondary, height: 1.6),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('لاحقاً',
+                style: TextStyle(fontFamily: TaybahFonts.ui, color: TaybahColors.textMuted)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('سماح'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) await svc.requestBatteryUnrestricted();
   }
 
   int? _loadedDay;
@@ -385,7 +416,6 @@ class _HomeTabState extends State<HomeTab> {
     _loadedDay = DateTime.now().day;
     final name = await SharedPrefsHelper.instance.getSelectedCityName();
     final slug = await SharedPrefsHelper.instance.getSelectedCitySlug();
-    final summer = await SharedPrefsHelper.instance.isSummerTime();
     final lr = await SharedPrefsHelper.instance.getLastRead();
     final pTrack = await SharedPrefsHelper.instance.getDailyPrayerTracker(_getTodayKey());
     final nTrack = await SharedPrefsHelper.instance.getDailyNawafilTracker(_getTodayKey());
@@ -395,7 +425,6 @@ class _HomeTabState extends State<HomeTab> {
     setState(() {
       _cityName = name;
       _citySlug = slug;
-      _isSummer = summer;
       _lastRead = lr;
       _prayerTracker = pTrack;
       _nawafilTracker = nTrack;
@@ -405,7 +434,7 @@ class _HomeTabState extends State<HomeTab> {
     final times = await PrayerApi.getPrayerTimesFromAlAwail(
       slug: _citySlug,
       cityName: name,
-      isSummer: summer,
+      isSummer: await SharedPrefsHelper.instance.isSummerTime(),
     );
 
     if (mounted) {
@@ -438,1128 +467,228 @@ class _HomeTabState extends State<HomeTab> {
     if (mounted) setState(() => _nawafilTracker = nTrack);
   }
 
+  static const _weekdays = [
+    'الاثنين',
+    'الثلاثاء',
+    'الأربعاء',
+    'الخميس',
+    'الجمعة',
+    'السبت',
+    'الأحد',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final nextPrayer = PrayerApi.calculateNextPrayer(_timings);
-    final nameOfAllah = _getDailyNameOfAllah();
-    final completedPrayers = _prayerTracker.values.where((v) => v).length;
+    final next = PrayerApi.calculateNextPrayer(_timings);
+    final dark = TaybahColors.isDark;
 
     return Scaffold(
       backgroundColor: TaybahColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 110),
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 120),
+          children: [
+            _header(dark),
+            const SizedBox(height: 18),
+            _heroPrayerCard(next, dark),
+            const SectionTitle('صلواتي اليوم'),
+            _prayerTrackerCard(),
+            const SizedBox(height: 12),
+            _contextAdhkarCard(),
+            const SizedBox(height: 12),
+            _continueReadingCard(),
+            SectionTitle('السنن والنوافل'),
+            _nawafilCard(),
+            const SectionTitle('الأقسام'),
+            _sectionsGrid(),
+            const SectionTitle('من نور الوحي'),
+            _dailyLightCard(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── الرأس ───
+  Widget _header(bool dark) {
+    final now = DateTime.now();
+    return Row(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(13),
+          child: Image.asset(TaybahBrand.logoAsset, width: 44, height: 44),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Header with Official Logo Emblem
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                    children: [
-                      // Official Logo Avatar
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: TaybahColors.surface,
-                          border: Border.all(
-                            color: TaybahColors.borderGlow,
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: TaybahColors.primary.withAlpha(25),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Text(
-                            _getGreeting(),
-                            maxLines: 1,
-                            style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: TaybahColors.primaryDark,
-                            ),
-                          ),
-                          ),
-                          Text(
-                            _getHijriDateApprox(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.cairo(
-                              fontSize: 12,
-                              color: TaybahColors.gold,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      ),
-                    ],
-                  ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Actions: City Badge & Settings Button
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: _openCityPicker,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: TaybahColors.surface,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: TaybahColors.border),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(6),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_on_rounded,
-                                size: 14,
-                                color: TaybahColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _cityName,
-                                style: GoogleFonts.cairo(
-                                  fontSize: 12.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: TaybahColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 1.5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _isSummer
-                                      ? TaybahColors.primaryLight
-                                      : TaybahColors.surfaceMuted,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  _isSummer ? 'صيفي' : 'شتوي',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: TaybahColors.primaryDark,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Settings Button
-                      GestureDetector(
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const SettingsScreen(),
-                            ),
-                          );
-                          _loadData();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            color: TaybahColors.surface,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: TaybahColors.border),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(6),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.settings_outlined,
-                            size: 19,
-                            color: TaybahColors.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              // Hero Al-Awail Next Prayer Card (12-Hour Format, Iqama Times & Live Countdown)
-              GestureDetector(
-                onTap: () => widget.onSwitchTab(2), // Navigate to Prayer Tab
-                child: Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                          ? [
-                              const Color(0xFF15803D), // Vibrant active green when prayer/iqama is active
-                              const Color(0xFF166534),
-                            ]
-                          : TaybahColors.isDark
-                              ? const [Color(0xFF173A26), Color(0xFF0A1A11)]
-                              : const [
-                                  TaybahColors.forestDeep,
-                                  TaybahColors.primaryMedium,
-                                ],
-                    ),
-                    borderRadius: BorderRadius.circular(26),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                            ? const Color(0xFF15803D).withAlpha(80)
-                            : TaybahColors.forestDeep.withAlpha(55),
-                        blurRadius: 22,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(30),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Colors.white.withAlpha(40),
-                                  ),
-                                ),
-                                child: Icon(
-                                  (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                                      ? Icons.notifications_active_rounded
-                                      : Icons.access_time_filled_rounded,
-                                  color: Colors.white,
-                                  size: 26,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                                        ? 'حان وقت الصلاة الآن'
-                                        : 'الصلاة القادمة (مواقيت الأوائل)',
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 11,
-                                      color: Colors.white70,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    nextPrayer['name'] ?? '',
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // 12-Hour formatted time (e.g. 04:42 م)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(35),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: TaybahColors.gold.withAlpha(80),
-                                  ),
-                                ),
-                                child: Text(
-                                  nextPrayer['time12'] ?? nextPrayer['time'] ?? '--:--',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.w900,
-                                    color: TaybahColors.goldLight,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                                    ? 'الإقامة: ${nextPrayer['iqamaTime12']}'
-                                    : 'الإقامة: ${nextPrayer['iqamaTime12']} (+${nextPrayer['iqamaDelayMinutes'] ?? 15}د)',
-                                style: GoogleFonts.cairo(
-                                  fontSize: 11.5,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Countdown Banner Box
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(40),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withAlpha(25)),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                                  ? '⏳ متبقي على إقامة الصلاة'
-                                  : '⏳ متبقي على الأذان',
-                              style: GoogleFonts.cairo(
-                                fontSize: 13,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              (nextPrayer['isBetweenAdhanAndIqama'] == true)
-                                  ? (nextPrayer['iqamaRemaining'] ?? '00:00')
-                                  : (nextPrayer['remaining'] ?? '00:00:00'),
-                              style: GoogleFonts.cairo(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                color: TaybahColors.goldLight,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: (nextPrayer['progress'] as double?) ?? 0.0,
-                          backgroundColor: Colors.white12,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            TaybahColors.goldLight,
-                          ),
-                          minHeight: 6,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // Mini Timetable Bar (All in 12-hour format)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(30),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildMiniPrayer('الفجر', _timings['Fajr'], nextPrayer['name'] == 'الفجر'),
-                            _buildMiniPrayer('الشروق', _timings['Sunrise'], false),
-                            _buildMiniPrayer('الظهر', _timings['Dhuhr'], nextPrayer['name'] == 'الظهر'),
-                            _buildMiniPrayer('العصر', _timings['Asr'], nextPrayer['name'] == 'العصر'),
-                            _buildMiniPrayer('المغرب', _timings['Maghrib'], nextPrayer['name'] == 'المغرب'),
-                            _buildMiniPrayer('العشاء', _timings['Isha'], nextPrayer['name'] == 'العشاء'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // Daily Prayers Tracker (سجل الصلوات الخمس اليومي)
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: TaybahColors.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: TaybahColors.border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(6),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: TaybahColors.primaryTint,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(
-                                Icons.fact_check_rounded,
-                                size: 18,
-                                color: TaybahColors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'سجل صلوات اليوم المفروضة',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: TaybahColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: completedPrayers == 5
-                                ? const Color(0xFFDCFCE7)
-                                : TaybahColors.primaryTint,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '$completedPrayers من 5 صلوات',
-                            style: GoogleFonts.cairo(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: completedPrayers == 5
-                                  ? const Color(0xFF15803D)
-                                  : TaybahColors.primaryDark,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildPrayerCheckButton('Fajr', 'الفجر'),
-                        _buildPrayerCheckButton('Dhuhr', 'الظهر'),
-                        _buildPrayerCheckButton('Asr', 'العصر'),
-                        _buildPrayerCheckButton('Maghrib', 'المغرب'),
-                        _buildPrayerCheckButton('Isha', 'العشاء'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Time-based Dhikr Banner
-              _buildTimeBasedDhikrBanner(),
-
-              const SizedBox(height: 16),
-
-              // Quran Bookmark / Khatmah Card
-              GestureDetector(
-                onTap: () => widget.onSwitchTab(1), // Quran Tab
-                child: Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: TaybahColors.surface,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: TaybahColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(6),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              TaybahColors.primary,
-                              TaybahColors.primaryAccent,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: TaybahColors.primary.withAlpha(40),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.bookmark_rounded,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'متابعة قراءة القرآن (رواية قالون)',
-                              style: GoogleFonts.cairo(
-                                fontSize: 11,
-                                color: TaybahColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'سورة ${_lastRead?['surahName'] ?? 'الفَاتِحة'}',
-                              style: GoogleFonts.amiri(
-                                fontSize: 19,
-                                fontWeight: FontWeight.bold,
-                                color: TaybahColors.textPrimary,
-                              ),
-                            ),
-                            Text(
-                              'الجزء ${_lastRead?['jozz'] ?? 1} • الآية ${_lastRead?['verseId'] ?? 1}',
-                              style: GoogleFonts.cairo(
-                                fontSize: 11,
-                                color: TaybahColors.textMuted,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: (((_lastRead?['jozz'] ?? 1) as int) / 30.0).clamp(0.0, 1.0),
-                                minHeight: 4,
-                                backgroundColor: TaybahColors.surfaceMuted,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  TaybahColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: TaybahColors.primary,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Text(
-                          'متابعة',
-                          style: GoogleFonts.cairo(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Daily Sunan & Nawafil Checklist
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: TaybahColors.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: TaybahColors.border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(6),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: TaybahColors.goldSoft,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Icon(
-                            Icons.volunteer_activism_rounded,
-                            size: 18,
-                            color: TaybahColors.gold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'السنن والنوافل اليومية',
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: TaybahColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildNaflChip('fajr_sunnah', 'سنة الفجر'),
-                        _buildNaflChip('duha', 'صلاة الضحى'),
-                        _buildNaflChip('dhuhr_rawatib', 'رواتب الظهر'),
-                        _buildNaflChip('maghrib_sunnah', 'سنة المغرب'),
-                        _buildNaflChip('witr', 'الوتر وقيام الليل'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Quick Access Grid Header
+              Text('طيبة', style: tStyle(20, weight: FontWeight.w800, height: 1.15)),
               Text(
-                'الأقسام الرئيسية',
-                style: GoogleFonts.cairo(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: TaybahColors.textPrimary,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.95,
-                children: [
-                  _buildQuickCard(
-                    title: 'القرآن الكريم',
-                    icon: Icons.menu_book_rounded,
-                    gradient: [TaybahColors.primary, TaybahColors.primaryAccent],
-                    onTap: () => widget.onSwitchTab(1),
-                  ),
-                  _buildQuickCard(
-                    title: 'مواقيت الصلاة',
-                    icon: Icons.mosque_rounded,
-                    gradient: [TaybahColors.forestDeep, TaybahColors.primaryMedium],
-                    onTap: () => widget.onSwitchTab(2),
-                  ),
-                  _buildQuickCard(
-                    title: 'الأذكار (135 باباً)',
-                    icon: Icons.auto_stories_rounded,
-                    gradient: const [Color(0xFF0284C7), Color(0xFF38BDF8)],
-                    onTap: () => widget.onSwitchTab(3),
-                  ),
-
-                  _buildQuickCard(
-                    title: 'أدعية الأنبياء',
-                    icon: Icons.volunteer_activism_rounded,
-                    gradient: const [Color(0xFFC49A32), Color(0xFFDFB651)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const DuasScreen()),
-                      );
-                    },
-                  ),
-                  _buildQuickCard(
-                    title: 'الحديث الشريف',
-                    icon: Icons.menu_book_sharp,
-                    gradient: const [Color(0xFFE11D48), Color(0xFFFB7185)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HadithScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildQuickCard(
-                    title: 'اتجاه القبلة',
-                    icon: Icons.explore_rounded,
-                    gradient: const [Color(0xFF0F766E), Color(0xFF14B8A6)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QiblaScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildQuickCard(
-                    title: 'أسماء الله الحسنى',
-                    icon: Icons.auto_awesome_rounded,
-                    customIcon: const AsmaAllahIcon(size: 26),
-                    gradient: const [Color(0xFFB45309), Color(0xFFF59E0B)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AsmaAllahScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _buildQuickCard(
-                    title: 'الرقية الشرعية',
-                    icon: Icons.shield_rounded,
-                    gradient: const [Color(0xFF15803D), Color(0xFF22C55E)],
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RuqyahScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              // Name of Allah of the Day Card
-              InkWell(
-                borderRadius: BorderRadius.circular(22),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AsmaAllahScreen()),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: TaybahColors.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: TaybahColors.border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(6),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            TaybahColors.primaryTint,
-                            TaybahColors.primaryLight,
-                          ],
-                        ),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: TaybahColors.primary.withAlpha(40),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          nameOfAllah['name'] ?? '',
-                          style: GoogleFonts.amiri(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: TaybahColors.primaryDark,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'اسم من أسماء الله الحسنى',
-                            style: GoogleFonts.cairo(
-                              fontSize: 11,
-                              color: TaybahColors.gold,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            nameOfAllah['meaning'] ?? '',
-                            style: GoogleFonts.cairo(
-                              fontSize: 13,
-                              color: TaybahColors.textPrimary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-              const SizedBox(height: 16),
-
-              // Prophetic Hadith Card (حديث اليوم النبوي الشريف)
-              Builder(builder: (context) {
-                final hadithData = _getDailyHadith();
-                return Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: TaybahColors.surface,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: TaybahColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(6),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: TaybahColors.primaryTint,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  Icons.menu_book_sharp,
-                                  size: 18,
-                                  color: TaybahColors.primary,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'حديث اليوم النبوي الشريف',
-                                style: GoogleFonts.cairo(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: TaybahColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.copy_rounded, size: 18),
-                            color: TaybahColors.primary,
-                            tooltip: 'نسخ الحديث',
-                            onPressed: () {
-                              Clipboard.setData(ClipboardData(
-                                text: '${hadithData['hadith']}\n[${hadithData['source']}]',
-                              ));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('تم نسخ الحديث الشريف بنجاح ✓'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        hadithData['hadith'] ?? '',
-                        style: GoogleFonts.amiri(
-                          fontSize: 18,
-                          height: 1.8,
-                          fontWeight: FontWeight.bold,
-                          color: TaybahColors.textPrimary,
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        hadithData['source'] ?? '',
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: TaybahColors.gold,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-
-              const SizedBox(height: 16),
-
-              // Daily Ayat / Zikr Card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: TaybahColors.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: TaybahColors.border),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(6),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.auto_awesome,
-                          color: TaybahColors.gold,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'آية وذكر اليوم',
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: TaybahColors.gold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.auto_awesome,
-                          color: TaybahColors.gold,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _getDailyZikr(),
-                      style: GoogleFonts.amiri(
-                        fontSize: 18,
-                        height: 1.8,
-                        color: TaybahColors.textPrimary,
-                      ),
-                      textAlign: TextAlign.center,
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
+                '${_weekdays[now.weekday - 1]} • ${_getHijriDateApprox()}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: tStyle(12.5,
+                    weight: FontWeight.w500, color: TaybahColors.textMuted),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildMiniPrayer(String name, dynamic time, bool isNext) {
-    // 12-hour format for mini prayers
-    final time12 = PrayerApi.formatTo12Hour(time);
-
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            name,
-            maxLines: 1,
-            style: GoogleFonts.cairo(
-              fontSize: 11,
-              color: isNext ? TaybahColors.goldLight : Colors.white70,
-              fontWeight: isNext ? FontWeight.bold : FontWeight.normal,
-            ),
+        Material(
+          color: dark ? Colors.white.withAlpha(14) : TaybahColors.surface,
+          shape: StadiumBorder(
+            side: BorderSide(
+                color: dark ? Colors.white.withAlpha(20) : TaybahColors.border),
           ),
-          const SizedBox(height: 2),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              time12,
-              style: GoogleFonts.cairo(
-                fontSize: 10.5,
-                fontWeight: isNext ? FontWeight.w900 : FontWeight.w600,
-                color: isNext ? Colors.white : Colors.white70,
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: _openCityPicker,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.place_outlined,
+                      size: 16,
+                      color: dark ? TaybahColors.goldLight : TaybahColors.forest),
+                  const SizedBox(width: 4),
+                  Text(_cityName, style: tStyle(13, weight: FontWeight.w600)),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPrayerCheckButton(String key, String label) {
-    final isDone = _prayerTracker[key] ?? false;
-
-    return GestureDetector(
-      onTap: () => _togglePrayer(key),
-      child: Column(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              gradient: isDone
-                  ? LinearGradient(
-                      colors: [
-                        TaybahColors.primary,
-                        TaybahColors.primaryAccent,
-                      ],
-                    )
-                  : null,
-              color: isDone ? null : TaybahColors.surfaceMuted,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isDone ? TaybahColors.primary : TaybahColors.border,
-                width: 1.5,
-              ),
-              boxShadow: isDone
-                  ? [
-                      BoxShadow(
-                        color: TaybahColors.primary.withAlpha(50),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Icon(
-              isDone ? Icons.check_rounded : Icons.radio_button_unchecked,
-              size: 22,
-              color: isDone ? Colors.white : TaybahColors.textMuted,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: GoogleFonts.cairo(
-              fontSize: 11,
-              fontWeight: isDone ? FontWeight.bold : FontWeight.normal,
-              color: isDone ? TaybahColors.primaryDark : TaybahColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNaflChip(String key, String label) {
-    final isDone = _nawafilTracker[key] ?? false;
-
-    return GestureDetector(
-      onTap: () => _toggleNafl(key),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isDone ? const Color(0xFFDCFCE7) : TaybahColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isDone ? const Color(0xFF86EFAC) : TaybahColors.border,
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        const SizedBox(width: 6),
+        IconButton(
+          tooltip: 'الإعدادات',
+          icon: Icon(Icons.settings_outlined, color: TaybahColors.textSecondary),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+          ).then((_) => _loadData()),
+        ),
+      ],
+    );
+  }
+
+  // ─── بطاقة الصلاة القادمة ───
+  Widget _heroPrayerCard(Map<String, dynamic> next, bool dark) {
+    final inIqama = next['isBetweenAdhanAndIqama'] == true;
+    final progress = ((next['progress'] as num?) ?? 0).toDouble().clamp(0.0, 1.0);
+    const keys = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+    const names = ['الفجر', 'الشروق', 'الظهر', 'العصر', 'المغرب', 'العشاء'];
+
+    return GestureDetector(
+      onTap: () => widget.onSwitchTab(2),
+      child: GlassContainer(
+        tint: dark ? const Color(0x8C0E2A1B) : const Color(0xD9183D24),
+        elevation: 1.4,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
+        child: Stack(
           children: [
-            Icon(
-              isDone ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
-              size: 14,
-              color: isDone ? const Color(0xFF15803D) : TaybahColors.textMuted,
+            Positioned.fill(
+              child: CustomPaint(
+                painter: GeometricPattern(
+                    color: TaybahColors.goldLight.withAlpha(dark ? 14 : 20)),
+              ),
             ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.cairo(
-                fontSize: 12,
-                fontWeight: isDone ? FontWeight.bold : FontWeight.w500,
-                color: isDone ? const Color(0xFF15803D) : TaybahColors.textPrimary,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        inIqama ? 'وقت الإقامة' : 'الصلاة القادمة',
+                        style: tStyle(13,
+                            weight: FontWeight.w500, color: Colors.white70),
+                      ),
+                      const Spacer(),
+                      if (inIqama)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: TaybahColors.goldLight,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text('حان الأذان',
+                              style: tStyle(11.5,
+                                  weight: FontWeight.w700,
+                                  color: TaybahColors.forestDeep)),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          next['name']?.toString() ?? '',
+                          style: tStyle(34,
+                              weight: FontWeight.w800,
+                              color: Colors.white,
+                              height: 1.2),
+                        ),
+                      ),
+                      Text(
+                        next['time12']?.toString() ?? '--:--',
+                        style: tStyle(26,
+                            weight: FontWeight.w700,
+                            color: TaybahColors.goldLight,
+                            height: 1.2),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(Icons.schedule_rounded,
+                          size: 16, color: Colors.white.withAlpha(170)),
+                      const SizedBox(width: 6),
+                      Text(
+                        inIqama
+                            ? 'الإقامة بعد ${next['iqamaRemaining']}'
+                            : 'بعد ${next['remaining']}',
+                        style: tStyle(15,
+                            weight: FontWeight.w600, color: Colors.white)
+                            .copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+                      ),
+                      const Spacer(),
+                      Text(
+                        'الإقامة ${next['iqamaTime12']}',
+                        style: tStyle(12.5,
+                            weight: FontWeight.w500, color: Colors.white60),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 3,
+                      backgroundColor: Colors.white.withAlpha(30),
+                      color: TaybahColors.goldLight,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      for (var i = 0; i < keys.length; i++)
+                        Expanded(
+                          child: _miniTime(
+                            names[i],
+                            _timings[keys[i]],
+                            next['key'] == keys[i],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -1568,163 +697,387 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _buildTimeBasedDhikrBanner() {
-    final hour = DateTime.now().hour;
-    String title;
-    String subtitle;
-    IconData icon;
-    Color color;
+  Widget _miniTime(String name, dynamic time, bool isNext) {
+    final t = PrayerApi.formatTo12Hour(time).replaceAll(' ص', '').replaceAll(' م', '');
+    return Column(
+      children: [
+        Text(name,
+            style: tStyle(11.5,
+                weight: isNext ? FontWeight.w700 : FontWeight.w500,
+                color: isNext ? TaybahColors.goldLight : Colors.white60)),
+        const SizedBox(height: 2),
+        Text(t,
+            style: tStyle(12.5,
+                weight: FontWeight.w700,
+                color: isNext ? Colors.white : Colors.white70)),
+        const SizedBox(height: 4),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          width: isNext ? 16 : 0,
+          height: 2,
+          decoration: BoxDecoration(
+            color: TaybahColors.goldLight,
+            borderRadius: BorderRadius.circular(1),
+          ),
+        ),
+      ],
+    );
+  }
 
-    if (hour >= 4 && hour < 12) {
-      title = 'أذكار الصباح';
-      subtitle = 'حصنك الحصين لبداية يوم مبارك مليء بالبركة';
-      icon = Icons.wb_sunny_rounded;
-      color = TaybahColors.gold;
-    } else if (hour >= 12 && hour < 19) {
-      title = 'أذكار المساء';
-      subtitle = 'ألا بذكر الله تطمئن القلوب وتنشرح الصدور';
-      icon = Icons.nights_stay_rounded;
-      color = TaybahColors.primaryMedium;
-    } else {
-      title = 'أذكار النوم وسورة الملك';
-      subtitle = 'باسمك ربي وضعت جنبي وبك أرفعه';
-      icon = Icons.bedtime_rounded;
-      color = const Color(0xFF6366F1);
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withAlpha(18),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: color.withAlpha(60)),
-      ),
-      child: Row(
+  // ─── سجل الصلوات ───
+  Widget _prayerTrackerCard() {
+    const items = [
+      ['Fajr', 'الفجر'],
+      ['Dhuhr', 'الظهر'],
+      ['Asr', 'العصر'],
+      ['Maghrib', 'المغرب'],
+      ['Isha', 'العشاء'],
+    ];
+    final done = _prayerTracker.values.where((v) => v).length;
+    return TCard(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withAlpha(40),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  done == 5
+                      ? 'أتممت صلوات اليوم، تقبّل الله منك'
+                      : 'سجّل ما أدّيت من الفرائض',
+                  style: tStyle(13, color: TaybahColors.textSecondary),
                 ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.cairo(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: TaybahColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.cairo(
-                    fontSize: 11,
-                    color: TaybahColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => widget.onSwitchTab(3), // Adhkar tab
-            style: ElevatedButton.styleFrom(
-              backgroundColor: color,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
               ),
-              elevation: 0,
-            ),
-            child: Text(
-              'قراءة',
-              style: GoogleFonts.cairo(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
+              Text('$done من 5',
+                  style: tStyle(13,
+                      weight: FontWeight.w700,
+                      color: TaybahColors.isDark
+                          ? TaybahColors.goldLight
+                          : TaybahColors.forest)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (final it in items) _prayerCheck(it[0], it[1]),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickCard({
-    required String title,
-    required IconData icon,
-    required List<Color> gradient,
-    required VoidCallback onTap,
-    Widget? customIcon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: TaybahColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: TaybahColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(6),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  Widget _prayerCheck(String key, String label) {
+    final isDone = _prayerTracker[key] ?? false;
+    final dark = TaybahColors.isDark;
+    return GestureDetector(
+      onTap: () => _togglePrayer(key),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: isDone
+                  ? TaybahColors.forest
+                  : (dark ? Colors.white.withAlpha(10) : TaybahColors.surfaceMuted),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDone
+                    ? TaybahColors.gold
+                    : (dark ? Colors.white.withAlpha(24) : TaybahColors.border),
+                width: 1.4,
+              ),
+            ),
+            child: Icon(
+              isDone ? Icons.check_rounded : null,
+              size: 22,
+              color: TaybahColors.goldLight,
+            ),
           ),
+          const SizedBox(height: 6),
+          Text(label,
+              style: tStyle(12,
+                  weight: isDone ? FontWeight.w700 : FontWeight.w500,
+                  color: isDone ? TaybahColors.textPrimary : TaybahColors.textMuted)),
         ],
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradient,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+    );
+  }
+
+  // ─── أذكار الوقت ───
+  Widget _contextAdhkarCard() {
+    final hour = DateTime.now().hour;
+    late String title, subtitle;
+    late IconData icon;
+    if (hour >= 4 && hour < 12) {
+      title = 'أذكار الصباح';
+      subtitle = 'أصبحنا وأصبح الملك لله';
+      icon = Icons.wb_sunny_outlined;
+    } else if (hour >= 12 && hour < 19) {
+      title = 'أذكار المساء';
+      subtitle = 'أمسينا وأمسى الملك لله';
+      icon = Icons.nights_stay_outlined;
+    } else {
+      title = 'أذكار النوم';
+      subtitle = 'باسمك ربي وضعت جنبي وبك أرفعه';
+      icon = Icons.bedtime_outlined;
+    }
+    return TCard(
+      onTap: () => widget.onSwitchTab(3),
+      child: Row(
+        children: [
+          TIconBox(icon: icon),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: tStyle(15, weight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: tStyle(12.5, color: TaybahColors.textMuted)),
+              ],
+            ),
+          ),
+          Icon(Icons.chevron_right_rounded, color: TaybahColors.textMuted),
+        ],
+      ),
+    );
+  }
+
+  // ─── متابعة القراءة ───
+  Widget _continueReadingCard() {
+    final jozz = ((_lastRead?['jozz'] ?? 1) as num).toInt();
+    return TCard(
+      onTap: () => widget.onSwitchTab(1),
+      child: Row(
+        children: [
+          const TIconBox(icon: Icons.menu_book_outlined),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('تابع القراءة',
+                    style: tStyle(12, color: TaybahColors.textMuted)),
+                Text(
+                  'سورة ${_lastRead?['surahName'] ?? 'الفَاتِحة'}',
+                  style: GoogleFonts.amiri(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: TaybahColors.textPrimary,
+                    height: 1.4,
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: gradient.first.withAlpha(50),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: (jozz / 30).clamp(0.0, 1.0),
+                          minHeight: 3,
+                          backgroundColor: TaybahColors.isDark
+                              ? Colors.white.withAlpha(16)
+                              : TaybahColors.surfaceMuted,
+                          color: TaybahColors.gold,
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 10),
+                    Text('الجزء $jozz من 30',
+                        style: tStyle(11.5, color: TaybahColors.textMuted)),
                   ],
                 ),
-                child: Center(
-                  child: customIcon ?? Icon(icon, color: Colors.white, size: 22),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                title,
-                style: GoogleFonts.cairo(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: TaybahColors.textPrimary,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          Icon(Icons.chevron_right_rounded, color: TaybahColors.textMuted),
+        ],
+      ),
+    );
+  }
+
+  // ─── السنن والنوافل ───
+  Widget _nawafilCard() {
+    const items = [
+      ['fajr_sunnah', 'سنة الفجر'],
+      ['duha', 'الضحى'],
+      ['dhuhr_rawatib', 'رواتب الظهر'],
+      ['maghrib_sunnah', 'سنة المغرب'],
+      ['witr', 'الوتر'],
+    ];
+    final dark = TaybahColors.isDark;
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final it in items)
+          Builder(builder: (context) {
+            final done = _nawafilTracker[it[0]] ?? false;
+            return GestureDetector(
+              onTap: () => _toggleNafl(it[0]),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                decoration: BoxDecoration(
+                  color: done ? TaybahColors.forest : TaybahColors.surface,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(
+                    color: done
+                        ? TaybahColors.forest
+                        : (dark ? Colors.white.withAlpha(20) : TaybahColors.border),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(done ? Icons.check_rounded : Icons.add_rounded,
+                        size: 16,
+                        color: done ? TaybahColors.goldLight : TaybahColors.textMuted),
+                    const SizedBox(width: 6),
+                    Text(it[1],
+                        style: tStyle(13,
+                            weight: FontWeight.w600,
+                            color: done ? Colors.white : TaybahColors.textPrimary)),
+                  ],
+                ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  // ─── الأقسام ───
+  Widget _sectionsGrid() {
+    void push(Widget page) =>
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    final items = <(String, IconData?, Widget?, VoidCallback)>[
+      ('القرآن الكريم', Icons.menu_book_outlined, null, () => widget.onSwitchTab(1)),
+      ('مواقيت الصلاة', Icons.access_time_rounded, null, () => widget.onSwitchTab(2)),
+      ('الأذكار', Icons.auto_stories_outlined, null, () => widget.onSwitchTab(3)),
+      ('القبلة', Icons.explore_outlined, null, () => push(const QiblaScreen())),
+      ('أسماء الله', null, null, () => push(const AsmaAllahScreen())),
+      ('الأدعية', Icons.volunteer_activism_outlined, null, () => push(const DuasScreen())),
+      ('الحديث', Icons.format_quote_rounded, null, () => push(const HadithScreen())),
+      ('الرقية', Icons.shield_outlined, null, () => push(const RuqyahScreen())),
+      ('الإعدادات', Icons.tune_rounded, null, () => push(const SettingsScreen())),
+    ];
+    final dark = TaybahColors.isDark;
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 1.08,
+      children: [
+        for (final (title, icon, _, onTap) in items)
+          TCard(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+            onTap: onTap,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TIconBox(
+                  icon: icon,
+                  size: 42,
+                  custom: icon == null
+                      ? AsmaAllahIcon(
+                          size: 22,
+                          color: dark ? TaybahColors.goldLight : TaybahColors.forest)
+                      : null,
+                ),
+                const SizedBox(height: 8),
+                Text(title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: tStyle(12.5, weight: FontWeight.w600)),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ─── من نور الوحي: آية، حديث، اسم من أسماء الله ───
+  Widget _dailyLightCard() {
+    final hadith = _getDailyHadith();
+    final name = _getDailyNameOfAllah();
+    final zikr = _getDailyZikr().split('\n');
+    final quote = GoogleFonts.amiri(
+      fontSize: 19,
+      height: 1.9,
+      color: TaybahColors.textPrimary,
+    );
+    Widget label(String t) => Text(t,
+        style: tStyle(12,
+            weight: FontWeight.w700,
+            color: TaybahColors.isDark ? TaybahColors.goldLight : TaybahColors.primaryAccent));
+    Widget divider() => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Divider(
+              height: 1,
+              color: TaybahColors.isDark
+                  ? Colors.white.withAlpha(16)
+                  : TaybahColors.border),
+        );
+
+    return TCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          label('آية'),
+          const SizedBox(height: 6),
+          Text(zikr.first, style: quote),
+          if (zikr.length > 1)
+            Text(zikr.last.replaceAll('- ', ''),
+                style: tStyle(12, color: TaybahColors.textMuted)),
+          divider(),
+          label('حديث'),
+          const SizedBox(height: 6),
+          Text(hadith['hadith'] ?? '', style: quote),
+          Text(hadith['source'] ?? '',
+              style: tStyle(12, color: TaybahColors.textMuted)),
+          divider(),
+          InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AsmaAllahScreen()),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      label('من أسماء الله الحسنى'),
+                      const SizedBox(height: 4),
+                      Text(name['name'] ?? '',
+                          style: GoogleFonts.amiri(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: TaybahColors.textPrimary)),
+                      Text(name['meaning'] ?? '',
+                          style: tStyle(12.5,
+                              color: TaybahColors.textSecondary, height: 1.6)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: TaybahColors.textMuted),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

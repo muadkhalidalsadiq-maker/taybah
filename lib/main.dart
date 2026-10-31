@@ -8,6 +8,7 @@ import 'data/notification_service.dart';
 import 'data/quran_player.dart';
 import 'data/shared_prefs_helper.dart';
 import 'presentation/welcome_screen.dart';
+import 'presentation/widgets/taybah_backdrop.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +70,10 @@ class _TaybahAppState extends State<TaybahApp> with WidgetsBindingObserver {
               GlobalCupertinoLocalizations.delegate,
             ],
             home: const WelcomeScreen(),
+            builder: (context, child) => TaybahBackdrop(
+              dark: appState.isDark,
+              child: child ?? const SizedBox.shrink(),
+            ),
           );
         },
       ),

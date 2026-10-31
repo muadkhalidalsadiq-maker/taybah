@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../core/theme.dart';
 import 'home_dashboard.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -64,7 +64,7 @@ class WelcomeScreen extends StatelessWidget {
                   // Title: "طيبة"
                   Text(
                     'طيبة',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF1B2A22),
@@ -87,7 +87,7 @@ class WelcomeScreen extends StatelessWidget {
 
                   Text(
                     'للأذكار والصلاة',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFFB8922B),
@@ -101,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                   // Subtitle: "حياكم الله"
                   Text(
                     'حياكم الله',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 26,
                       fontWeight: FontWeight.w600,
                       color: darkGreenColor,
@@ -114,7 +114,7 @@ class WelcomeScreen extends StatelessWidget {
                   // Tagline: "طيبة لمن طاب قلبه بذكر الله"
                   Text(
                     'طيبة لمن طاب قلبه بذكر الله',
-                    style: GoogleFonts.cairo(
+                    style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 15,
                       fontWeight: FontWeight.w400,
                       color: mutedTextColor,
@@ -149,7 +149,7 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                         child: Text(
                           'الدخول إلى طيبة',
-                          style: GoogleFonts.cairo(
+                          style: TextStyle(fontFamily: TaybahFonts.ui, 
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
