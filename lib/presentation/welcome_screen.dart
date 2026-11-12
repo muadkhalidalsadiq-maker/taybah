@@ -86,7 +86,7 @@ class WelcomeScreen extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   Text(
-                    'للأذكار والصلاة',
+                    'للأذكار والقرآن',
                     style: TextStyle(fontFamily: TaybahFonts.ui, 
                       fontSize: 18,
                       fontWeight: FontWeight.w600,

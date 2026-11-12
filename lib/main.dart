@@ -53,7 +53,7 @@ class _TaybahAppState extends State<TaybahApp> with WidgetsBindingObserver {
       child: Consumer<AppState>(
         builder: (context, appState, child) {
           return MaterialApp(
-            title: 'طيبة للأذكار والصلاة',
+            title: 'طيبة للأذكار والقرآن',
             debugShowCheckedModeBanner: false,
             theme: TaybahTheme.lightTheme,
             darkTheme: TaybahTheme.darkTheme,
