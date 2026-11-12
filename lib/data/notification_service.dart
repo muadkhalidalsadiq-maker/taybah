@@ -337,7 +337,7 @@ class NotificationService {
         id: 'adhan_${voice.id}_$prayerKey',
         title: 'أذان ${prayerNames[prayerKey] ?? ''}',
         artist: voice.name,
-        album: 'طيبة للأذكار والصلاة',
+        album: 'طيبة للأذكار والقرآن',
       );
       if (_isAndroid) {
         final name = AdhanVoices.rawName(voice, prayerKey);

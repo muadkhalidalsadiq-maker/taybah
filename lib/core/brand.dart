@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// عناصر الهوية البصرية لتطبيق «طيبة للأذكار والصلاة».
+/// عناصر الهوية البصرية لتطبيق «طيبة للأذكار والقرآن».
 class TaybahBrand {
   TaybahBrand._();
 
-  static const String appName = 'طيبة للأذكار والصلاة';
+  static const String appName = 'طيبة للأذكار والقرآن';
   static const String shortName = 'طيبة';
   static const String tagline = 'طيبة لمن طاب قلبه بذكر الله';
   static const String logoAsset = 'assets/images/logo.png';

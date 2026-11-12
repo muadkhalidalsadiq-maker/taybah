@@ -1158,7 +1158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'طيبة للأذكار والصلاة • الإصدار 3.0',
+                            'طيبة للأذكار والقرآن • الإصدار 3.0',
                             style: TextStyle(fontFamily: TaybahFonts.ui, 
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
